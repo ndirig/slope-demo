@@ -5,6 +5,9 @@ let coordinateRange = 16;
 // Canvas for coordinate plane
 let plane = document.getElementById('coordinatePlane');
 
+// Pixels between coordinates for plane at current size
+let gridSpacing = 0;
+
 // Draws grid lines for coordinate plane
 function drawGrid(ctx, gridSpacing) {
   ctx.strokeStyle = 'rgb(0, 0, 0)';
@@ -41,7 +44,7 @@ function drawAxes(ctx) {
   ctx.stroke();
 }
 
-// Draws the coordinate plane in the canvas element
+// Prepares coordinate plane for drawing
 function initPlane(width, height) {
   // Set starting dimensions for canvas.  Will be tweaked later
   plane.width = width;
@@ -53,7 +56,7 @@ function initPlane(width, height) {
     let smallerCanvasDimension = (width > height) ? height : width;
 
     // Determine space between coordinates for plane at current size
-    let gridSpacing = Math.floor((smallerCanvasDimension / coordinateRange));
+    gridSpacing = Math.floor((smallerCanvasDimension / coordinateRange));
 
     // Resize Canvas so that lines fall on integer pixel values, preventing
     // antialiasing (the +1 handles the 0.5 adjustments in drawLines method)
@@ -61,11 +64,19 @@ function initPlane(width, height) {
     // Don't ask me why I'm using floor now.. this ensures axes are centered
     plane.width = (Math.floor(width / gridSpacing) * gridSpacing) + 1;
 
-    // Set line style and draw grid lines
-    let ctx = plane.getContext('2d');
-    drawGrid(ctx, gridSpacing);
-    drawAxes(ctx);
+    // Draws the coordinate plane
+    redraw();
   }
+}
+
+// Draws the coordinate plane
+function redraw() {
+  // Set line style and draw grid lines
+  let ctx = plane.getContext('2d');
+  // erases previous point position
+  ctx.clearRect(0, 0, plane.width, plane.height);
+  drawGrid(ctx, gridSpacing);
+  drawAxes(ctx);
 }
 
 function update(mouseX, mouseY) {
@@ -80,25 +91,14 @@ function update(mouseX, mouseY) {
   }
 }
 
-// DOESN'T WORK YET
-/*
-function getPlaneX() {
-  return (plane.offsetLeft - plane.scrollLeft + plane.clientLeft);
-}
-
-function getPlaneY() {
-  return (plane.offsetTop - plane.scrollTop + plane.clientTop);
-}*/
-
-// FIX
+// Gets the screen position of mouse, adjusting for canvas position
 function getMousePosition(e) {
-
-  let mouseX = e.clientX - getPlaneX;
-  let mouseY = e.clientY - getPlaneY;
+  let mouseX = e.offsetX;
+  let mouseY = e.offsetY;
+  redraw();
   update(mouseX, mouseY);
 }
 
-plane.addEventListener("mousemove", getMousePosition, false);
-
 // takes width and height as args
 initPlane(832,855);
+plane.addEventListener("mousemove", getMousePosition, false);
