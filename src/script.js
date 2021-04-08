@@ -2,8 +2,11 @@
 // The coordinate plane will span at least this many units.  Make it an even int
 let coordinateRange = 16;
 
+// Canvas for coordinate plane
+let plane = document.getElementById('coordinatePlane');
+
 // Draws grid lines for coordinate plane
-function drawGrid(plane, ctx, gridSpacing) {
+function drawGrid(ctx, gridSpacing) {
   ctx.strokeStyle = 'rgb(0, 0, 0)';
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -26,7 +29,7 @@ function drawGrid(plane, ctx, gridSpacing) {
 }
 
 // Draws x and y axes
-function drawAxes(plane, ctx) {
+function drawAxes(ctx) {
   ctx.lineWidth = 3;
   ctx.beginPath();
   // Draw axes in the middle
@@ -39,28 +42,63 @@ function drawAxes(plane, ctx) {
 }
 
 // Draws the coordinate plane in the canvas element
-function initPlane() {
-  let plane = document.getElementById('coordinatePlane');
+function initPlane(width, height) {
+  // Set starting dimensions for canvas.  Will be tweaked later
+  plane.width = width;
+  plane.height = height;
   // checking browser for Canvas support
   if (plane.getContext) {
-
     // Determine the size of the canvas and draw grid based
     // off the smaller of its dimensions
-    let smallerCanvasDimension = (plane.width > plane.height) ? plane.height : plane.width;
+    let smallerCanvasDimension = (width > height) ? height : width;
 
     // Determine space between coordinates for plane at current size
-    let gridSpacing = Math.round((smallerCanvasDimension / coordinateRange));
+    let gridSpacing = Math.floor((smallerCanvasDimension / coordinateRange));
 
     // Resize Canvas so that lines fall on integer pixel values, preventing
     // antialiasing (the +1 handles the 0.5 adjustments in drawLines method)
-    plane.height = (Math.floor(plane.height / gridSpacing) * gridSpacing) + 1;
-    plane.width = (Math.floor(plane.width / gridSpacing) * gridSpacing) + 1;
+    plane.height = (Math.round(height / gridSpacing) * gridSpacing) + 1;
+    // Don't ask me why I'm using floor now.. this ensures axes are centered
+    plane.width = (Math.floor(width / gridSpacing) * gridSpacing) + 1;
 
     // Set line style and draw grid lines
     let ctx = plane.getContext('2d');
-    drawGrid(plane, ctx, gridSpacing);
-    drawAxes(plane, ctx);
+    drawGrid(ctx, gridSpacing);
+    drawAxes(ctx);
   }
 }
 
-initPlane();
+function update(mouseX, mouseY) {
+  // checking browser for Canvas support
+  if (plane.getContext) {
+    let ctx = plane.getContext('2d');
+    ctx.beginPath();
+    ctx.arc(mouseX, mouseY, 2, 0, 2 * Math.PI, true);
+    ctx.fillStyle = "#FF6A6A";
+    ctx.fill();
+    requestAnimationFrame(update);
+  }
+}
+
+// DOESN'T WORK YET
+/*
+function getPlaneX() {
+  return (plane.offsetLeft - plane.scrollLeft + plane.clientLeft);
+}
+
+function getPlaneY() {
+  return (plane.offsetTop - plane.scrollTop + plane.clientTop);
+}*/
+
+// FIX
+function getMousePosition(e) {
+
+  let mouseX = e.clientX - getPlaneX;
+  let mouseY = e.clientY - getPlaneY;
+  update(mouseX, mouseY);
+}
+
+plane.addEventListener("mousemove", getMousePosition, false);
+
+// takes width and height as args
+initPlane(832,855);
