@@ -3,7 +3,11 @@
 let coordinateRange = 16;
 
 // Draws grid lines for coordinate plane
-function drawLines(plane, ctx, gridSpacing) {
+function drawGrid(plane, ctx, gridSpacing) {
+  ctx.strokeStyle = 'rgb(0, 0, 0)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+
   // Draw vertical lines
   for (let x = 0; x <= plane.width; x += gridSpacing) {
     // 0.5 adjustments fix Canvas boundary mismatches, sharpening the lines
@@ -11,6 +15,7 @@ function drawLines(plane, ctx, gridSpacing) {
     ctx.lineTo(x+0.5, plane.height);
     ctx.stroke();
   }
+
   // Draw horizontal lines
   for (let y = 0; y <= plane.height; y += gridSpacing) {
     // 0.5 adjustments fix Canvas boundary mismatches, sharpening the lines
@@ -18,6 +23,19 @@ function drawLines(plane, ctx, gridSpacing) {
     ctx.lineTo(plane.width, y+0.5);
     ctx.stroke();
   }
+}
+
+// Draws x and y axes
+function drawAxes(plane, ctx) {
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  // Draw axes in the middle
+  ctx.moveTo(0, plane.height/2);
+  ctx.lineTo(plane.width, plane.height/2);
+  ctx.stroke();
+  ctx.moveTo(plane.width/2, 0);
+  ctx.lineTo(plane.width/2, plane.height);
+  ctx.stroke();
 }
 
 // Draws the coordinate plane in the canvas element
@@ -40,11 +58,8 @@ function initPlane() {
 
     // Set line style and draw grid lines
     let ctx = plane.getContext('2d');
-    ctx.strokeStyle = 'rgb(0, 0, 0)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    drawLines(plane, ctx, gridSpacing);
-
+    drawGrid(plane, ctx, gridSpacing);
+    drawAxes(plane, ctx);
   }
 }
 
