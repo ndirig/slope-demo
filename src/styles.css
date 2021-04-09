@@ -15,4 +15,5 @@
   border-radius: 50%;
   touch-action: none;
   user-select: none;
+  position: absolute;
 }

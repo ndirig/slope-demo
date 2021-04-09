@@ -12,13 +12,28 @@ let gridSpacing = 0;
 let mouseX = 0;
 let mouseY = 0;
 
+// Offset to account for radius of pinned point element.  Ensures
+// that the center of pinned points align with where the user clicked
+let ptOffset = (document.querySelector(".point").offsetWidth / 2);
+
 // Keeps track of point 1's data
 let pt1 = {
-  // plane coordinates
-  x: 0,
+  x: 0, // refers to plane coordinates
   y: 0,
-  // whether the user has clicked on plane to set point's position
-  set: false
+  screenPosX: 0, // refers to screen pixel position in the canvas
+  screenPosY: 0,
+  // whether the user has clicked on plane to pinned point's position
+  pinned: false
+};
+
+// Keeps track of point 2's data
+let pt2 = {
+  x: 0, // refers to plane coordinates
+  y: 0,
+  screenPosX: 0, // refers to screen pixel position in the canvas
+  screenPosY: 0,
+  // whether the user has clicked on plane to pinned point's position
+  pinned: false
 };
 
 // Draws grid lines for coordinate plane
@@ -27,7 +42,7 @@ function drawGrid(ctx, gridSpacing) {
   ctx.lineWidth = 1;
   ctx.beginPath();
 
-  // Draw vertical lines
+  // Draw vertical grid lines
   for (let x = 0; x <= plane.width; x += gridSpacing) {
     // 0.5 adjustments fix Canvas boundary mismatches, sharpening the lines
     ctx.moveTo(x+0.5, 0);
@@ -35,7 +50,7 @@ function drawGrid(ctx, gridSpacing) {
     ctx.stroke();
   }
 
-  // Draw horizontal lines
+  // Draw horizontal grid lines
   for (let y = 0; y <= plane.height; y += gridSpacing) {
     // 0.5 adjustments fix Canvas boundary mismatches, sharpening the lines
     ctx.moveTo(0, y+0.5);
@@ -76,8 +91,8 @@ function initPlane(width, height) {
     // Determine space between coordinates for plane at current size
     gridSpacing = Math.floor((smallerCanvasDimension / coordinateRange));
 
-    // Resize Canvas so that lines fall on integer pixel values, preventing
-    // antialiasing (the +1 handles the 0.5 adjustments in drawLines method)
+    // Resize Canvas so that grid lines fall on integer pixel values, preventing
+    // antialiasing (the +1 handles the 0.5 adjustments in drawGrid method)
     plane.height = (Math.round(height / gridSpacing) * gridSpacing) + 1;
     // Don't ask me why I'm using floor now.. this ensures axes are centered
     plane.width = (Math.floor(width / gridSpacing) * gridSpacing) + 1;
@@ -116,6 +131,12 @@ function drawHoverPoint(pt) {
 
     // get coordinates for point using mouse screen position
     let planeCoord = screenToPlaneTranslate(translation.x, translation.y);
+    // save absolute screen position of point
+    // pt.screenPosX = plane.offsetLeft + translation.x - ptOffset;
+    // pt.screenPosY = plane.offsetTop + translation.y - ptOffset;
+    pt.screenPosX = translation.x;
+    pt.screenPosY = translation.y;
+
     // save current coordinates in point
     pt.x = planeCoord.x;
     pt.y = planeCoord.y;
@@ -176,34 +197,74 @@ function getMousePosition(e) {
   mouseY = e.offsetY;
 }
 
+// Draws a line between two points
+function drawLine() {
+  // if one point isn't on the plane, do not draw a line
+  if (pt1.pinned && plane.getContext) {
+    let ctx = plane.getContext('2d');
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgb(28, 92, 28)';
+    // when pt2 is not pinned, line is dotted
+    if (!pt2.pinned) {
+      ctx.setLineDash([5, 5]);
+      // moving dotted line animation
+      ctx.lineDashOffset -= .25;
+    }
+    ctx.lineWidth = 3;
+    ctx.moveTo(pt1.screenPosX, pt1.screenPosY);
+    ctx.lineTo(pt2.screenPosX, pt2.screenPosY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
 // Redraws coordinate plane
 function updatePlane() {
   drawPlane();
-  if (!pt1.set) drawHoverPoint(pt1);
-  else if (!pt2.set) drawHoverPoint(pt2);
+  if (!pt1.pinned) drawHoverPoint(pt1);
+  else if (!pt2.pinned) drawHoverPoint(pt2);
 
-  // drawSetPoints
+  // draws line between points
+  drawLine();
 
   // Updates screen every frame
   requestAnimationFrame(updatePlane);
 }
 
-// Determines what action should be taken upon mouse click
-/*function mouseClick(e) {
-  // pin the first point on the plane
-  if (!pt1.set) {
-    pt1.set = true;
+// Draw point element on plane when user clicks to pin point
+function pinPoint() {
+  // user is pinning first point to plane
+  if (!pt1.pinned) {
+    // position pinned point element in plane
+    document.getElementById("pt1").style.left = pt1.screenPosX +
+    plane.offsetLeft - ptOffset + "px";
+    // offset adjusts for position of coord plane in document body
+    document.getElementById("pt1").style.top = pt1.screenPosY +
+    plane.offsetTop - ptOffset + "px";
+    document.getElementById("pt1").hidden = false;
+    pt1.pinned = true;
   }
-}*/
+  else if (!pt2.pinned) {
+    // position pinned point element in plane
+    document.getElementById("pt2").style.left = pt2.screenPosX +
+    plane.offsetLeft - ptOffset + "px";
+    // offset adjusts for position of coord plane in document body
+    document.getElementById("pt2").style.top = pt2.screenPosY +
+    plane.offsetTop - ptOffset + "px";
+    document.getElementById("pt2").hidden = false;
+    pt2.pinned = true;
+  }
+  // if both points are already pinned, do nothing
+}
+
+// Determines what action should be taken upon mouse click
+function mouseClick(e) {
+  // pin point on plane, if applicable
+  pinPoint();
+}
 
 // takes width and height as args
 initPlane(500,400);
 plane.addEventListener("mousemove", getMousePosition, false);
-//plane.addEventListener("click", mouseClick, false);
+plane.addEventListener("click", mouseClick, false);
 updatePlane();
-
-
-
-// when integer snap is checked:
-// build array of coordinates
-// implement method to translate discrete coordinates to screen position
