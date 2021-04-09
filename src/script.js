@@ -16,6 +16,11 @@ let mouseY = 0;
 // that the center of pinned points align with where the user clicked
 let ptOffset = (document.querySelector(".point").offsetWidth / 2);
 
+// Slope
+let m = 0;
+// y intercept
+let b = 0;
+
 // Keeps track of point 1's data
 let pt1 = {
   x: 0, // refers to plane coordinates
@@ -214,12 +219,52 @@ function drawLine() {
     ctx.moveTo(pt1.screenPosX, pt1.screenPosY);
     ctx.lineTo(pt2.screenPosX, pt2.screenPosY);
     ctx.stroke();
+    // reset line dash to be solid
     ctx.setLineDash([]);
   }
 }
 
-// Redraws coordinate plane
-function updatePlane() {
+// Displays correct values of m and b in the equation header
+function displayEquation() {
+  let eq = document.getElementById("eq");
+  // recalculates slope and y intercept
+  m = calcSlope(pt1, pt2);
+  b = calcYInt(pt1, m);
+  // if there's no points, default to displaying "y=mx+b"
+  if (!pt1.pinned) {
+    eq.innerHTML = "y=<span id='slope'>m</span>x+<span id='yint'>b</span>";
+  }
+  // account for undefined slope
+  else if (!isFinite(m) || isNaN(m)) {
+    eq.innerHTML = "Undefined slope";
+  }
+  else if (m == 0) {
+    eq.innerHTML = "y=<span id='yint'>" + b + "</span>";
+  }
+  else {  // change m and y values in equation header
+    eq.innerHTML = "y=<span id='slope'>" + m + "</span>x+<span id='yint'>" +
+    b + "</span>";
+  }
+}
+
+// Finds coordinates where an infinite line intercepts the boundary edges
+// of the canvas.  Takes two points as args
+function getPlaneBoundaryIntercepts(pt1, pt2) {
+
+}
+
+// Calculates slope between two points
+function calcSlope(a, b) {
+  return ((b.y - a.y)/(b.x - a.x)).toFixed(2);
+}
+
+// Calculates the y intercept of a line
+function calcYInt(pt, m) {
+  return (pt.y - (m * pt.x)).toFixed(2);
+}
+
+// Redraws coordinate plane and equation
+function update() {
   drawPlane();
   if (!pt1.pinned) drawHoverPoint(pt1);
   else if (!pt2.pinned) drawHoverPoint(pt2);
@@ -227,8 +272,11 @@ function updatePlane() {
   // draws line between points
   drawLine();
 
+  // updates equation to reflect current slope
+  displayEquation();
+
   // Updates screen every frame
-  requestAnimationFrame(updatePlane);
+  requestAnimationFrame(update);
 }
 
 // Draw point element on plane when user clicks to pin point
@@ -267,4 +315,4 @@ function mouseClick(e) {
 initPlane(500,400);
 plane.addEventListener("mousemove", getMousePosition, false);
 plane.addEventListener("click", mouseClick, false);
-updatePlane();
+update();
