@@ -1,4 +1,12 @@
 
+#slope {
+  color: rgb(0, 0, 255);
+}
+
+#yint {
+  color: rgb(255, 0, 0);
+}
+
 #pt1 {
   background-color: rgb(245, 230, 99);
   border: 3px solid rgba(136, 136, 136, .5);
