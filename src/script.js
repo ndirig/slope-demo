@@ -85,15 +85,36 @@ function drawPlane() {
   }
 }
 
-function drawHoverPoint(mouseX, mouseY) {
+// Draws a point that follows mouse on coordinate plane
+function drawHoverPoint() {
   // checking browser for Canvas support
   if (plane.getContext) {
+    // when integer snap is enabled, point will only
+    // be drawn on discrete coordinates.  Otherwise translation does nothing
+    let translation = integerSnapTranslate();  // returns coord pair object
+
     let ctx = plane.getContext('2d');
     ctx.beginPath();
-    ctx.arc(mouseX, mouseY, 4, 0, 2 * Math.PI, true);
+    ctx.arc(translation.x, translation.y, 4, 0, 2 * Math.PI, true);
     ctx.fillStyle = "#FF6A6A";
     ctx.fill();
   }
+}
+
+// Translate a hovering point position to be on a discrete coordinate,
+// if Integer Snap is enabled - otherwise return continuous mouse position
+function integerSnapTranslate() {
+  let transX = mouseX;
+  let transY = mouseY;
+
+  if (document.getElementById("intSnap").checked) {
+    
+  }
+
+  return {
+    x: transX,
+    y: transY
+  };
 }
 
 // Gets the screen position of mouse, adjusting for canvas position
@@ -105,7 +126,7 @@ function getMousePosition(e) {
 // Redraws coordinate plane
 function updatePlane() {
   drawPlane();
-  drawHoverPoint(mouseX, mouseY);
+  drawHoverPoint();
   // Updates screen every frame
   requestAnimationFrame(updatePlane);
 }
