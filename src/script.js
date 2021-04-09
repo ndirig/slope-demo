@@ -8,6 +8,10 @@ let plane = document.getElementById('coordinatePlane');
 // Pixels between coordinates for plane at current size
 let gridSpacing = 0;
 
+// Keeps track of mouse position
+let mouseX = 0;
+let mouseY = 0;
+
 // Draws grid lines for coordinate plane
 function drawGrid(ctx, gridSpacing) {
   ctx.strokeStyle = 'rgb(0, 0, 0)';
@@ -65,40 +69,54 @@ function initPlane(width, height) {
     plane.width = (Math.floor(width / gridSpacing) * gridSpacing) + 1;
 
     // Draws the coordinate plane
-    redraw();
+    drawPlane();
   }
 }
 
 // Draws the coordinate plane
-function redraw() {
-  // Set line style and draw grid lines
-  let ctx = plane.getContext('2d');
-  // erases previous point position
-  ctx.clearRect(0, 0, plane.width, plane.height);
-  drawGrid(ctx, gridSpacing);
-  drawAxes(ctx);
+function drawPlane() {
+  if (plane.getContext) {
+    // Set line style and draw grid lines
+    let ctx = plane.getContext('2d');
+    // erases previous point position
+    ctx.clearRect(0, 0, plane.width, plane.height);
+    drawGrid(ctx, gridSpacing);
+    drawAxes(ctx);
+  }
 }
 
-function update(mouseX, mouseY) {
+function drawHoverPoint(mouseX, mouseY) {
   // checking browser for Canvas support
   if (plane.getContext) {
     let ctx = plane.getContext('2d');
     ctx.beginPath();
-    ctx.arc(mouseX, mouseY, 2, 0, 2 * Math.PI, true);
+    ctx.arc(mouseX, mouseY, 4, 0, 2 * Math.PI, true);
     ctx.fillStyle = "#FF6A6A";
     ctx.fill();
-    requestAnimationFrame(update);
   }
 }
 
 // Gets the screen position of mouse, adjusting for canvas position
 function getMousePosition(e) {
-  let mouseX = e.offsetX;
-  let mouseY = e.offsetY;
-  redraw();
-  update(mouseX, mouseY);
+  mouseX = e.offsetX;
+  mouseY = e.offsetY;
+}
+
+// Redraws coordinate plane
+function updatePlane() {
+  drawPlane();
+  drawHoverPoint(mouseX, mouseY);
+  // Updates screen every frame
+  requestAnimationFrame(updatePlane);
 }
 
 // takes width and height as args
-initPlane(832,855);
+initPlane(500,400);
 plane.addEventListener("mousemove", getMousePosition, false);
+updatePlane();
+
+
+
+// when integer snap is checked:
+// build array of coordinates
+// implement method to translate discrete coordinates to screen position
