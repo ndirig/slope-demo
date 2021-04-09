@@ -13,7 +13,7 @@ let mouseX = 0;
 let mouseY = 0;
 
 // Keeps track of point 1's data
-let pt1Coord = {
+let pt1 = {
   // plane coordinates
   x: 0,
   y: 0,
@@ -62,6 +62,11 @@ function initPlane(width, height) {
   // Set starting dimensions for canvas.  Will be tweaked later
   plane.width = width;
   plane.height = height;
+
+  // hide pinned point elements
+  document.getElementById("pt1").hidden = true;
+  document.getElementById("pt2").hidden = true;
+
   // checking browser for Canvas support
   if (plane.getContext) {
     // Determine the size of the canvas and draw grid based
@@ -95,7 +100,7 @@ function drawPlane() {
 }
 
 // Draws a point that follows mouse on coordinate plane
-function drawHoverPoint() {
+function drawHoverPoint(pt) {
   // checking browser for Canvas support
   if (plane.getContext) {
     // when integer snap is enabled, point will only
@@ -111,7 +116,9 @@ function drawHoverPoint() {
 
     // get coordinates for point using mouse screen position
     let planeCoord = screenToPlaneTranslate(translation.x, translation.y);
-    //console.log(planeCoord.x + "," + planeCoord.y);
+    // save current coordinates in point
+    pt.x = planeCoord.x;
+    pt.y = planeCoord.y;
   }
 }
 
@@ -172,14 +179,27 @@ function getMousePosition(e) {
 // Redraws coordinate plane
 function updatePlane() {
   drawPlane();
-  drawHoverPoint();
+  if (!pt1.set) drawHoverPoint(pt1);
+  else if (!pt2.set) drawHoverPoint(pt2);
+
+  // drawSetPoints
+
   // Updates screen every frame
   requestAnimationFrame(updatePlane);
 }
 
+// Determines what action should be taken upon mouse click
+/*function mouseClick(e) {
+  // pin the first point on the plane
+  if (!pt1.set) {
+    pt1.set = true;
+  }
+}*/
+
 // takes width and height as args
 initPlane(500,400);
 plane.addEventListener("mousemove", getMousePosition, false);
+//plane.addEventListener("click", mouseClick, false);
 updatePlane();
 
 

@@ -4,6 +4,7 @@
 <head>
   <title>Slope Demonstration</title>
   <meta charset="utf-8"/>
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -11,10 +12,10 @@
   <header>
 
     <button>Clear</button>
-    <label for="pt1">Pt. 1</label>
-    <input type="text" id="pt1"/>
-    <label for="pt2">Pt. 2</label>
-    <input type="text" id="pt2"/>
+    <label for="pt1Input">Pt. 1</label>
+    <input type="text" id="pt1Input"/>
+    <label for="pt2Input">Pt. 2</label>
+    <input type="text" id="pt2Input"/>
     <label for="intSnap">Integer Snap</label>
     <input type="checkbox" id="intSnap" checked/>
 
@@ -22,7 +23,12 @@
 
   <h1>y=mx+b</h1>
 
-  <canvas id="coordinatePlane">Interactive coordinate plane</canvas>
+  <div>
+      <canvas id="coordinatePlane">Interactive coordinate plane</canvas>
+      <!-- Point objects, appear once plane is clicked -->
+      <div id="pt1" class="point"></div>
+      <div id="pt2" class="point"></div>
+  </div>
 
   <!-- Script must be after Canvas element -->
   <script src="script.js"></script>

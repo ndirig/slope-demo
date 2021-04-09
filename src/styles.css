@@ -1,0 +1,18 @@
+
+#pt1 {
+  background-color: rgb(245, 230, 99);
+  border: 3px solid rgba(136, 136, 136, .5);
+}
+
+#pt2 {
+  background-color: rgb(66, 135, 245);
+  border: 3px solid rgba(29, 76, 150, .5);
+}
+
+.point {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  touch-action: none;
+  user-select: none;
+}
