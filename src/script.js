@@ -98,20 +98,20 @@ function drawPlane() {
 function drawHoverPoint() {
   // checking browser for Canvas support
   if (plane.getContext) {
-
-    //console.log(mouseX + "," + mouseY);
-    let planeCoord = screenToPlaneTranslate(mouseX, mouseY);
-    console.log(planeCoord.x + "," + planeCoord.y);
-
     // when integer snap is enabled, point will only
     // be drawn on discrete coordinates.  Otherwise translation does nothing
     let translation = integerSnapTranslate();  // returns coord pair object
 
+    // draw point
     let ctx = plane.getContext('2d');
     ctx.beginPath();
-    ctx.arc(translation.x, translation.y, 4, 0, 2 * Math.PI, true);
+    ctx.arc(translation.x, translation.y, 5, 0, 2 * Math.PI, true);
     ctx.fillStyle = "#FF6A6A";
     ctx.fill();
+
+    // get coordinates for point using mouse screen position
+    let planeCoord = screenToPlaneTranslate(translation.x, translation.y);
+    //console.log(planeCoord.x + "," + planeCoord.y);
   }
 }
 
@@ -132,6 +132,12 @@ function screenToPlaneTranslate(screenPosX, screenPosY) {
   // -1 flips y direction so that positive y values are above origin
   coordY = -1 * (screenPosY / gridSpacing);
 
+  // coordinates must be integers if integer snap is on
+  if (document.getElementById("intSnap").checked) {
+    coordX = Math.round(coordX);
+    coordY = Math.round(coordY);
+  }
+
   return {
     x: coordX,
     y: coordY
@@ -145,7 +151,10 @@ function integerSnapTranslate() {
   let transY = mouseY;
 
   if (document.getElementById("intSnap").checked) {
-
+    // perform translation
+    transX = Math.round(transX / gridSpacing) * gridSpacing;
+    // -1 flips y direction so that positive y values are above origin
+    transY = Math.round(transY / gridSpacing) * gridSpacing;
   }
 
   return {
