@@ -12,6 +12,15 @@ let gridSpacing = 0;
 let mouseX = 0;
 let mouseY = 0;
 
+// Keeps track of point 1's data
+let pt1Coord = {
+  // plane coordinates
+  x: 0,
+  y: 0,
+  // whether the user has clicked on plane to set point's position
+  set: false
+};
+
 // Draws grid lines for coordinate plane
 function drawGrid(ctx, gridSpacing) {
   ctx.strokeStyle = 'rgb(0, 0, 0)';
@@ -89,6 +98,11 @@ function drawPlane() {
 function drawHoverPoint() {
   // checking browser for Canvas support
   if (plane.getContext) {
+
+    //console.log(mouseX + "," + mouseY);
+    let planeCoord = screenToPlaneTranslate(mouseX, mouseY);
+    console.log(planeCoord.x + "," + planeCoord.y);
+
     // when integer snap is enabled, point will only
     // be drawn on discrete coordinates.  Otherwise translation does nothing
     let translation = integerSnapTranslate();  // returns coord pair object
@@ -101,6 +115,29 @@ function drawHoverPoint() {
   }
 }
 
+// Take a point's screen position and determine its coordinates on the plane
+function screenToPlaneTranslate(screenPosX, screenPosY) {
+  let coordX = 0;
+  let coordY = 0;
+
+  // NOTE: screenPos values should already account for offset based off
+  // plane's screen position
+
+  // move origin to the center of the plane
+  screenPosX -= (plane.width / 2);
+  screenPosY -= (plane.height / 2);
+
+  // perform translation
+  coordX = screenPosX / gridSpacing;
+  // -1 flips y direction so that positive y values are above origin
+  coordY = -1 * (screenPosY / gridSpacing);
+
+  return {
+    x: coordX,
+    y: coordY
+  };
+}
+
 // Translate a hovering point position to be on a discrete coordinate,
 // if Integer Snap is enabled - otherwise return continuous mouse position
 function integerSnapTranslate() {
@@ -108,7 +145,7 @@ function integerSnapTranslate() {
   let transY = mouseY;
 
   if (document.getElementById("intSnap").checked) {
-    
+
   }
 
   return {
