@@ -83,6 +83,7 @@ function initPlane(width, height) {
   document.getElementById("pt1").hidden = true;
   document.getElementById("pt2").hidden = true;
   document.getElementById("intercept").hidden = true;
+  document.getElementById("slopeLabel").hidden = true;
 
   // checking browser for Canvas support
   if (plane.getContext) {
@@ -242,27 +243,32 @@ function drawLine() {
 
 // Displays correct values of m and b in the equation header
 function displayEquation() {
-  let eq = document.getElementById("eq");
-  // recalculates slope and y intercept
-  m = calcSlope(pt1, pt2);
-  b = calcYInt(pt1, m);
-  // if there's no points, default to displaying "y=mx+b"
-  if (!pt1.pinned) {
-    eq.innerHTML = "y=<span id='slope'>m</span>x+<span id='yint'>b</span>";
-  }
-  // account for undefined slope
-  else if (!isFinite(m) || isNaN(m)) {
-    eq.innerHTML = "Undefined slope";
-  }
-  else if (m == 0) {
-    eq.innerHTML = "y=<span id='yint'>" + b + "</span>";
-  }
-  else if (b == 0) {
-    eq.innerHTML = "y=<span id='slope'>" + m + "</span>x";
-  }
-  else {  // change m and y values in equation header
-    eq.innerHTML = "y=<span id='slope'>" + m + "</span>x+<span id='yint'>" +
-    b + "</span>";
+  if (!(pt1.pinned && pt2.pinned)) {  // do not redraw eq if points pinned
+    let eq = document.getElementById("eq");
+    let html;
+    // recalculates slope and y intercept
+    m = calcSlope(pt1, pt2);
+    b = calcYInt(pt1, m);
+    // if there's no points, default to displaying "y=mx+b"
+    if (!pt1.pinned) {
+      html = 'y=<span id="slope">m</span>x+<span id="yint">b</span>';
+    }
+    // account for undefined slope
+    else if (!isFinite(m) || isNaN(m)) {
+      html = "Undefined slope";
+    }
+    else if (m == 0) {
+      html = 'y=<span id="yint">' + b + '</span>';
+    }
+    else if (b == 0) {
+      html = 'y=<span id="slope">' + m + '</span>x';
+    }
+    else {  // change m and y values in equation header
+      html = 'y=<span id="slope">' + m + '</span>x+<span id="yint">' +
+      b + '</span>';
+    }
+    // do not redraw eq if nothing is changing -- no extra work
+    if (eq.innerHTML !== html) eq.innerHTML = html;
   }
 }
 
@@ -296,22 +302,28 @@ function calcYInt(pt, m) {
 
 // Calculates the midpoint of two points
 function calcMidpoint(x1, y1, x2, y2) {
+  //console.log("("+x1+"+"+x2+")/2 + ("+x1+"+"+x2+")/2")
   return {
     x: (x1 + x2)/2,
     y: (y1 + y2)/2
   };
 }
 
+// Draw a label next to the line indicating slope
 function drawSlopeLabel() {
-  // find midpoint of line.  Use boundary intercepts so label is centered
-  bound = getPlaneBoundaryIntercepts();
-  midpoint = calcMidpoint(bound.xBoundary1, bound.yBoundary1,
-    bound.xBoundary2, bound.yBoundary2);
-  // if positive slope, display label to left.  if neg, right
-  let offset = m >= 0 ? 20 : -20;
-  screenPos = planeCoordToAbsScreenPosition(midpoint.x, midpoint.y,
-    offset, offset);
-
+  let label = document.getElementById("slopeLabel");
+    // display when first point is pinned.  do not redraw if nothing changed
+  if (pt1.pinned && m != label.innerHTML) {
+    // find midpoint of line, put the label there
+    midpoint = calcMidpoint(pt1.x, pt1.y,
+      pt2.x, pt2.y);
+    screenPos = planeCoordToAbsScreenPosition(midpoint.x, midpoint.y,
+      0, 0);
+    label.hidden = false;
+    label.innerHTML = m;
+    label.style.left = screenPos.x + "px";
+    label.style.top = screenPos.y + "px";
+  }
 }
 
 // Redraws coordinate plane and equation
@@ -324,7 +336,7 @@ function update() {
   drawLine();
 
   // draws numerical label next to line indicating slope
-  //drawSlopeLabel();
+  drawSlopeLabel();
 
   // updates equation to reflect current slope
   displayEquation();
@@ -384,7 +396,7 @@ function mouseClick(e) {
 }
 
 // takes width and height as args
-initPlane(500,500);
+initPlane(500,400);
 plane.addEventListener("mousemove", getMousePosition, false);
 plane.addEventListener("click", mouseClick, false);
 update();
