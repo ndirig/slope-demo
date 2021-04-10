@@ -257,17 +257,19 @@ function displayEquation() {
 // Finds coordinates where an infinite line intercepts the boundary edges
 // of the canvas
 function getPlaneBoundaryIntercepts() {
+  // Using y=mx+b to find bounds.  Negatives account for opposite y direction
+  let bound1y = (-1 * m * (plane.width / 2)) - (b * gridSpacing);
+  let bound2y = (m * (plane.width / 2)) - (b * gridSpacing);
 
-    let bound1y = (m * -1 * (plane.width/2)) + (b * gridSpacing);
-    let bound2y = (m * 1 * (plane.width/2)) + (b * gridSpacing);
-
-    return {
-      xBoundary1: (2*pt1.x*gridSpacing),
-      yBoundary1: bound2y + (plane.height/2) - (2*pt1.y*gridSpacing),
-      //yBoundary1: bound2y +  (plane.height/2),
-      xBoundary2: plane.width + (2*pt1.x*gridSpacing),
-      yBoundary2: bound1y + (plane.height/2)- (2*pt1.y*gridSpacing)
-    };
+  return {
+    // we found boundary ints above with x = 0 and width (notice I accounted
+    // for the origin offset in that calculation)
+    xBoundary1: 0,
+    // height / 2 is accounting for the origin being offset
+    yBoundary1: bound2y +  (plane.height/2),
+    xBoundary2: plane.width,
+    yBoundary2: bound1y + (plane.height/2)
+  };
 }
 
 // Calculates slope between two points
@@ -329,7 +331,7 @@ function mouseClick(e) {
 }
 
 // takes width and height as args
-initPlane(500,400);
+initPlane(300,400);
 plane.addEventListener("mousemove", getMousePosition, false);
 plane.addEventListener("click", mouseClick, false);
 update();
