@@ -1,8 +1,8 @@
 
 #intercept {
   width: 14px;
-  height: 3px;
-  background-color: rgb(255, 0, 0);
+  height: 5px;
+  background-color: rgb(173, 46, 40);
   touch-action: none;
   user-select: none;
   position: absolute;
@@ -13,8 +13,19 @@
   color: rgb(0, 0, 255);
 }
 
-#yint {
-  color: rgb(255, 0, 0);
+#slopeLabel {
+  background-color: rgba(152, 173, 227, .9);
+  border: 2px solid rgba(152, 173, 227, .9);
+  font-size: 12px;
+}
+
+#yIntLabel {
+  background-color: rgba(227, 167, 152, .9);
+  border: 2px solid rgba(227, 167, 152, .9);
+}
+
+#yint, #yIntLabel {
+  color: rgb(173, 46, 40);
 }
 
 #pt1 {
@@ -39,7 +50,5 @@
 .label {
   font-size: 20px;
   position: absolute;
-  background-color: rgba(152, 173, 227, .9);
-  border: 2px solid rgba(152, 173, 227, .9);
   border-radius: 10%;
 }

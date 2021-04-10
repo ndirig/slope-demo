@@ -73,17 +73,23 @@ function drawAxes(ctx) {
   ctx.stroke();
 }
 
+// Hides pinned point and label elements
+function hideElements() {
+  document.getElementById("pt1").hidden = true;
+  document.getElementById("pt2").hidden = true;
+  document.getElementById("intercept").hidden = true;
+  document.getElementById("slopeLabel").hidden = true;
+  document.getElementById("yIntLabel").hidden = true;
+}
+
 // Prepares coordinate plane for drawing
 function initPlane(width, height) {
   // Set starting dimensions for canvas.  Will be tweaked later
   plane.width = width;
   plane.height = height;
 
-  // hide pinned point elements
-  document.getElementById("pt1").hidden = true;
-  document.getElementById("pt2").hidden = true;
-  document.getElementById("intercept").hidden = true;
-  document.getElementById("slopeLabel").hidden = true;
+  // hide pinned point and label elements
+  hideElements();
 
   // checking browser for Canvas support
   if (plane.getContext) {
@@ -302,7 +308,6 @@ function calcYInt(pt, m) {
 
 // Calculates the midpoint of two points
 function calcMidpoint(x1, y1, x2, y2) {
-  //console.log("("+x1+"+"+x2+")/2 + ("+x1+"+"+x2+")/2")
   return {
     x: (x1 + x2)/2,
     y: (y1 + y2)/2
@@ -324,6 +329,16 @@ function drawSlopeLabel() {
     label.style.left = screenPos.x + "px";
     label.style.top = screenPos.y + "px";
   }
+}
+
+// Displays y intercept coordinates in a label
+function drawYIntLabel() {
+  let label = document.getElementById("yIntLabel");
+  screenPos = planeCoordToAbsScreenPosition(0, b, 10, 0);
+  label.hidden = false;
+  label.innerHTML = "(0, " + b + ")";
+  label.style.left = screenPos.x + "px";
+  label.style.top = screenPos.y + "px";
 }
 
 // Redraws coordinate plane and equation
@@ -399,4 +414,8 @@ function mouseClick(e) {
 initPlane(500,400);
 plane.addEventListener("mousemove", getMousePosition, false);
 plane.addEventListener("click", mouseClick, false);
+document.getElementById("intercept").addEventListener("mouseenter",
+  drawYIntLabel, false);
+document.getElementById("intercept").addEventListener("mouseleave",
+  function(){ document.getElementById("yIntLabel").hidden = true; }, false);
 update();
