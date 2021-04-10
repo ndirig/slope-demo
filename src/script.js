@@ -15,6 +15,7 @@ let mouseY = 0;
 // Offset to account for radius of pinned point element.  Ensures
 // that the center of pinned points align with where the user clicked
 let ptOffset = (document.querySelector(".point").offsetWidth / 2);
+let dashOffset = document.getElementById("intercept").offsetHeight / 2;
 
 // Slope
 let m = 0;
@@ -86,6 +87,7 @@ function initPlane(width, height) {
   // hide pinned point elements
   document.getElementById("pt1").hidden = true;
   document.getElementById("pt2").hidden = true;
+  document.getElementById("intercept").hidden = true;
 
   // checking browser for Canvas support
   if (plane.getContext) {
@@ -137,8 +139,6 @@ function drawHoverPoint(pt) {
     // get coordinates for point using mouse screen position
     let planeCoord = screenToPlaneTranslate(translation.x, translation.y);
     // save absolute screen position of point
-    // pt.screenPosX = plane.offsetLeft + translation.x - ptOffset;
-    // pt.screenPosY = plane.offsetTop + translation.y - ptOffset;
     pt.screenPosX = translation.x;
     pt.screenPosY = translation.y;
 
@@ -174,6 +174,19 @@ function screenToPlaneTranslate(screenPosX, screenPosY) {
   return {
     x: coordX,
     y: coordY
+  };
+}
+
+// Take a point coordinates from our graph representation and translate
+// to a pixel position on canvas
+function planeCoordToScreenPosition(coordX, coordY) {
+  // find offset for origin
+  let screenPosX = (coordX * gridSpacing) + (plane.width / 2);
+  let screenPosY = (-1 * coordY * gridSpacing) + (plane.height / 2);
+  return {
+    x: screenPosX,
+    y: screenPosY
+    // -1 flips y direction to graphics coord system (pos y goes down)
   };
 }
 
@@ -320,6 +333,14 @@ function pinPoint() {
     plane.offsetTop - ptOffset + "px";
     document.getElementById("pt2").hidden = false;
     pt2.pinned = true;
+    // place hash mark where the y intercept lies
+    document.getElementById("intercept").hidden = false;
+    // place in the middle, on the x axis
+    document.getElementById("intercept").style.left = (plane.width/2) +
+    plane.offsetLeft - ptOffset + "px";
+    //console.log(planeCoordToScreenPosition(0,b));
+    document.getElementById("intercept").style.top = planeCoordToScreenPosition(0,b).y +
+    plane.offsetTop - dashOffset + "px";
   }
   // if both points are already pinned, do nothing
 }
@@ -331,7 +352,7 @@ function mouseClick(e) {
 }
 
 // takes width and height as args
-initPlane(300,400);
+initPlane(500,500);
 plane.addEventListener("mousemove", getMousePosition, false);
 plane.addEventListener("click", mouseClick, false);
 update();
