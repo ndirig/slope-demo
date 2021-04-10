@@ -1,5 +1,5 @@
 
-// The coordinate plane will span at least this many units.  Make it an even int
+// The coordinate plane will span at least this many units.  Must be even!
 let coordinateRange = 16;
 
 // Canvas for coordinate plane
@@ -216,8 +216,12 @@ function drawLine() {
       ctx.lineDashOffset -= .25;
     }
     ctx.lineWidth = 3;
-    ctx.moveTo(pt1.screenPosX, pt1.screenPosY);
-    ctx.lineTo(pt2.screenPosX, pt2.screenPosY);
+    // we want the line to extend past the points up to the edges of the plane
+    // therefore we need the canvas boundary intercepts
+    let boundInt = getPlaneBoundaryIntercepts();
+    //console.log(boundInt);
+    ctx.moveTo(boundInt.xBoundary1, boundInt.yBoundary1);
+    ctx.lineTo(boundInt.xBoundary2, boundInt.yBoundary2);
     ctx.stroke();
     // reset line dash to be solid
     ctx.setLineDash([]);
@@ -241,6 +245,9 @@ function displayEquation() {
   else if (m == 0) {
     eq.innerHTML = "y=<span id='yint'>" + b + "</span>";
   }
+  else if (b == 0) {
+    eq.innerHTML = "y=<span id='slope'>" + m + "</span>x";
+  }
   else {  // change m and y values in equation header
     eq.innerHTML = "y=<span id='slope'>" + m + "</span>x+<span id='yint'>" +
     b + "</span>";
@@ -248,9 +255,19 @@ function displayEquation() {
 }
 
 // Finds coordinates where an infinite line intercepts the boundary edges
-// of the canvas.  Takes two points as args
-function getPlaneBoundaryIntercepts(pt1, pt2) {
+// of the canvas
+function getPlaneBoundaryIntercepts() {
 
+    let bound1y = (m * -1 * (plane.width/2)) + (b * gridSpacing);
+    let bound2y = (m * 1 * (plane.width/2)) + (b * gridSpacing);
+
+    return {
+      xBoundary1: (2*pt1.x*gridSpacing),
+      yBoundary1: bound2y + (plane.height/2) - (2*pt1.y*gridSpacing),
+      //yBoundary1: bound2y +  (plane.height/2),
+      xBoundary2: plane.width + (2*pt1.x*gridSpacing),
+      yBoundary2: bound1y + (plane.height/2)- (2*pt1.y*gridSpacing)
+    };
 }
 
 // Calculates slope between two points
