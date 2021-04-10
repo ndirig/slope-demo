@@ -12,11 +12,6 @@ let gridSpacing = 0;
 let mouseX = 0;
 let mouseY = 0;
 
-// Offset to account for radius of pinned point element.  Ensures
-// that the center of pinned points align with where the user clicked
-let ptOffset = (document.querySelector(".point").offsetWidth / 2);
-let dashOffset = document.getElementById("intercept").offsetHeight / 2;
-
 // Slope
 let m = 0;
 // y intercept
@@ -232,7 +227,6 @@ function drawLine() {
     // we want the line to extend past the points up to the edges of the plane
     // therefore we need the canvas boundary intercepts
     let boundInt = getPlaneBoundaryIntercepts();
-    //console.log(boundInt);
     ctx.moveTo(boundInt.xBoundary1, boundInt.yBoundary1);
     ctx.lineTo(boundInt.xBoundary2, boundInt.yBoundary2);
     ctx.stroke();
@@ -311,36 +305,46 @@ function update() {
   requestAnimationFrame(update);
 }
 
-// Draw point element on plane when user clicks to pin point
-function pinPoint() {
+// Positions point element based on saved coordinates
+function pinPoint(id, pt) {
+  document.getElementById(id).hidden = false;
+  // Offset to account for radius of pinned point element.  Ensures
+  // that the center of pinned points align with where the user clicked
+  let ptOffset = (document.querySelector(".point").offsetWidth / 2);
+  // position pinned point element in plane
+  document.getElementById(id).style.left = pt.screenPosX +
+  plane.offsetLeft - ptOffset + "px";
+  // offset adjusts for position of coord plane in document body
+  document.getElementById(id).style.top = pt.screenPosY +
+  plane.offsetTop - ptOffset + "px";
+  pt.pinned = true;
+}
+
+// Draws dash mark on x axis where y intercept lies
+function drawYIntDash() {
+  document.getElementById("intercept").hidden = false;
+  // Offset to account for height of dash element.  Ensures
+  // that the center of dash aligns with where the user clicked
+  let dashOffset = document.getElementById("intercept").offsetHeight / 2;
+  let ptOffset = (document.querySelector(".point").offsetWidth / 2);
+  // place in the middle, on the x axis
+  document.getElementById("intercept").style.left = (plane.width/2) +
+  plane.offsetLeft - ptOffset + "px";
+  // take calculated y int and translate to find its screen position
+  document.getElementById("intercept").style.top =
+  planeCoordToScreenPosition(0,b).y + plane.offsetTop - dashOffset + "px";
+}
+
+// Draws point elements on plane when user clicks to pin point
+function drawPinnedPoint() {
   // user is pinning first point to plane
   if (!pt1.pinned) {
-    // position pinned point element in plane
-    document.getElementById("pt1").style.left = pt1.screenPosX +
-    plane.offsetLeft - ptOffset + "px";
-    // offset adjusts for position of coord plane in document body
-    document.getElementById("pt1").style.top = pt1.screenPosY +
-    plane.offsetTop - ptOffset + "px";
-    document.getElementById("pt1").hidden = false;
-    pt1.pinned = true;
+    pinPoint("pt1", pt1);
   }
   else if (!pt2.pinned) {
-    // position pinned point element in plane
-    document.getElementById("pt2").style.left = pt2.screenPosX +
-    plane.offsetLeft - ptOffset + "px";
-    // offset adjusts for position of coord plane in document body
-    document.getElementById("pt2").style.top = pt2.screenPosY +
-    plane.offsetTop - ptOffset + "px";
-    document.getElementById("pt2").hidden = false;
-    pt2.pinned = true;
+    pinPoint("pt2", pt2);
     // place hash mark where the y intercept lies
-    document.getElementById("intercept").hidden = false;
-    // place in the middle, on the x axis
-    document.getElementById("intercept").style.left = (plane.width/2) +
-    plane.offsetLeft - ptOffset + "px";
-    //console.log(planeCoordToScreenPosition(0,b));
-    document.getElementById("intercept").style.top = planeCoordToScreenPosition(0,b).y +
-    plane.offsetTop - dashOffset + "px";
+    drawYIntDash();
   }
   // if both points are already pinned, do nothing
 }
@@ -348,7 +352,7 @@ function pinPoint() {
 // Determines what action should be taken upon mouse click
 function mouseClick(e) {
   // pin point on plane, if applicable
-  pinPoint();
+  drawPinnedPoint();
 }
 
 // takes width and height as args
