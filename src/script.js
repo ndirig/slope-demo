@@ -21,8 +21,8 @@ let b = 0;
 let pt1 = {
   x: 0, // refers to plane coordinates
   y: 0,
-  screenPosX: 0, // refers to screen pixel position in the canvas
-  screenPosY: 0,
+  canvasPosX: 0, // refers to mouse's pixel position in the canvas
+  canvasPosY: 0,
   // whether the user has clicked on plane to pinned point's position
   pinned: false
 };
@@ -31,8 +31,8 @@ let pt1 = {
 let pt2 = {
   x: 0, // refers to plane coordinates
   y: 0,
-  screenPosX: 0, // refers to screen pixel position in the canvas
-  screenPosY: 0,
+  canvasPosX: 0, // refers to mouse's pixel position in the canvas
+  canvasPosY: 0,
   // whether the user has clicked on plane to pinned point's position
   pinned: false
 };
@@ -132,10 +132,10 @@ function drawHoverPoint(pt) {
     ctx.fill();
 
     // get coordinates for point using mouse screen position
-    let planeCoord = screenToPlaneTranslate(translation.x, translation.y);
-    // save absolute screen position of point
-    pt.screenPosX = translation.x;
-    pt.screenPosY = translation.y;
+    let planeCoord = mouseToPlaneTranslate(translation.x, translation.y);
+    // save pixel position of point relative to origin of canvas
+    pt.canvasPosX = translation.x;
+    pt.canvasPosY = translation.y;
 
     // save current coordinates in point
     pt.x = planeCoord.x;
@@ -143,8 +143,8 @@ function drawHoverPoint(pt) {
   }
 }
 
-// Take a point's screen position and determine its coordinates on the plane
-function screenToPlaneTranslate(screenPosX, screenPosY) {
+// Take the mouse's canvas position and determine its coordinates on the plane
+function mouseToPlaneTranslate(mousePosX, mousePosY) {
   let coordX = 0;
   let coordY = 0;
 
@@ -152,13 +152,13 @@ function screenToPlaneTranslate(screenPosX, screenPosY) {
   // plane's screen position
 
   // move origin to the center of the plane
-  screenPosX -= (plane.width / 2);
-  screenPosY -= (plane.height / 2);
+  mousePosX -= (plane.width / 2);
+  mousePosY -= (plane.height / 2);
 
   // perform translation
-  coordX = screenPosX / gridSpacing;
+  coordX = mousePosX / gridSpacing;
   // -1 flips y direction so that positive y values are above origin
-  coordY = -1 * (screenPosY / gridSpacing);
+  coordY = -1 * (mousePosY / gridSpacing);
 
   // coordinates must be integers if integer snap is on
   if (document.getElementById("intSnap").checked) {
@@ -173,11 +173,16 @@ function screenToPlaneTranslate(screenPosX, screenPosY) {
 }
 
 // Take a point coordinates from our graph representation and translate
-// to a pixel position on canvas
-function planeCoordToScreenPosition(coordX, coordY) {
-  // find offset for origin
-  let screenPosX = (coordX * gridSpacing) + (plane.width / 2);
-  let screenPosY = (-1 * coordY * gridSpacing) + (plane.height / 2);
+// to an absolute pixel position on the screen
+function planeCoordToAbsScreenPosition(coordX, coordY, offsetX, offsetY) {
+  // account for plane's "origin" being different than the canvas origin.
+  // also account for canvas not starting at 0,0 in document's body.
+  // offset var allows for small adjustments
+  let screenPosX = (coordX * gridSpacing) + (plane.width / 2) +
+    plane.offsetLeft + offsetX;
+  let screenPosY = (-1 * coordY * gridSpacing) + (plane.height / 2) +
+    plane.offsetTop + offsetY;
+
   return {
     x: screenPosX,
     y: screenPosY
@@ -289,6 +294,26 @@ function calcYInt(pt, m) {
   return (pt.y - (m * pt.x)).toFixed(2);
 }
 
+// Calculates the midpoint of two points
+function calcMidpoint(x1, y1, x2, y2) {
+  return {
+    x: (x1 + x2)/2,
+    y: (y1 + y2)/2
+  };
+}
+
+function drawSlopeLabel() {
+  // find midpoint of line.  Use boundary intercepts so label is centered
+  bound = getPlaneBoundaryIntercepts();
+  midpoint = calcMidpoint(bound.xBoundary1, bound.yBoundary1,
+    bound.xBoundary2, bound.yBoundary2);
+  // if positive slope, display label to left.  if neg, right
+  let offset = m >= 0 ? 20 : -20;
+  screenPos = planeCoordToAbsScreenPosition(midpoint.x, midpoint.y,
+    offset, offset);
+
+}
+
 // Redraws coordinate plane and equation
 function update() {
   drawPlane();
@@ -297,6 +322,9 @@ function update() {
 
   // draws line between points
   drawLine();
+
+  // draws numerical label next to line indicating slope
+  //drawSlopeLabel();
 
   // updates equation to reflect current slope
   displayEquation();
@@ -312,10 +340,10 @@ function pinPoint(id, pt) {
   // that the center of pinned points align with where the user clicked
   let ptOffset = (document.querySelector(".point").offsetWidth / 2);
   // position pinned point element in plane
-  document.getElementById(id).style.left = pt.screenPosX +
+  document.getElementById(id).style.left = pt.canvasPosX +
   plane.offsetLeft - ptOffset + "px";
   // offset adjusts for position of coord plane in document body
-  document.getElementById(id).style.top = pt.screenPosY +
+  document.getElementById(id).style.top = pt.canvasPosY +
   plane.offsetTop - ptOffset + "px";
   pt.pinned = true;
 }
@@ -323,16 +351,16 @@ function pinPoint(id, pt) {
 // Draws dash mark on x axis where y intercept lies
 function drawYIntDash() {
   document.getElementById("intercept").hidden = false;
-  // Offset to account for height of dash element.  Ensures
+  // Offset to account for dimensions of dash element.  Ensures
   // that the center of dash aligns with where the user clicked
-  let dashOffset = document.getElementById("intercept").offsetHeight / 2;
-  let ptOffset = (document.querySelector(".point").offsetWidth / 2);
-  // place in the middle, on the x axis
-  document.getElementById("intercept").style.left = (plane.width/2) +
-  plane.offsetLeft - ptOffset + "px";
-  // take calculated y int and translate to find its screen position
-  document.getElementById("intercept").style.top =
-  planeCoordToScreenPosition(0,b).y + plane.offsetTop - dashOffset + "px";
+  let dashOffsetY = document.getElementById("intercept").offsetHeight / -2;
+  let dashOffsetX = document.getElementById("intercept").offsetWidth / -2;
+
+  // take calculated y int and translate to find absolute screen position
+  let absPos = planeCoordToAbsScreenPosition(0, b, dashOffsetX, dashOffsetY);
+
+  document.getElementById("intercept").style.left = absPos.x + "px";
+  document.getElementById("intercept").style.top = absPos.y + "px";
 }
 
 // Draws point elements on plane when user clicks to pin point

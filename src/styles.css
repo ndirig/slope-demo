@@ -9,7 +9,7 @@
   z-index: auto;
 }
 
-#slope {
+#slope #slopeLabel {
   color: rgb(0, 0, 255);
 }
 
@@ -34,4 +34,8 @@
   touch-action: none;
   user-select: none;
   position: absolute;
+}
+
+.label {
+  font-size: 10px;
 }
