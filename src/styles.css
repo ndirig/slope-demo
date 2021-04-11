@@ -14,18 +14,18 @@ input[type=text] {
 }
 
 #slope, #slopeLabel {
-  color: rgb(0, 0, 255);
+  color: rgb(57, 76, 196);
 }
 
 #slopeLabel {
-  background-color: rgba(152, 173, 227, .9);
-  border: 2px solid rgba(152, 173, 227, .9);
+  background-color: rgba(206, 211, 237, .9);
+  border: 2px solid rgba(206, 211, 237, .9);
   font-size: 12px;
 }
 
 #yIntLabel {
-  background-color: rgba(227, 167, 152, .9);
-  border: 2px solid rgba(227, 167, 152, .9);
+  background-color: rgba(235, 204, 204, .9);
+  border: 2px solid rgba(235, 204, 204, .9);
 }
 
 #yint, #yIntLabel {
@@ -33,13 +33,13 @@ input[type=text] {
 }
 
 #pt1 {
-  background-color: rgb(245, 230, 99);
-  border: 3px solid rgba(136, 136, 136, .5);
+  background-color: rgb(131, 73, 245);
+  border: 3px solid rgba(67, 37, 125, .5);
 }
 
 #pt2 {
-  background-color: rgb(66, 135, 245);
-  border: 3px solid rgba(29, 76, 150, .5);
+  background-color: rgb(232, 157, 28);
+  border: 3px solid rgba(138, 95, 21, .5);
 }
 
 .point {
@@ -55,4 +55,12 @@ input[type=text] {
   font-size: 20px;
   position: absolute;
   border-radius: 10%;
+}
+
+.pt1 {
+  color: rgb(131, 73, 245);
+}
+
+.pt2 {
+  color: rgb(232, 157, 28);
 }

@@ -41,7 +41,7 @@ let pt2 = {
 
 // Draws grid lines for coordinate plane
 function drawGrid(ctx, gridSpacing) {
-  ctx.strokeStyle = 'rgb(0, 0, 0)';
+  ctx.strokeStyle = 'rgb(134, 173, 240)';
   ctx.lineWidth = 1;
   ctx.beginPath();
 
@@ -65,6 +65,7 @@ function drawGrid(ctx, gridSpacing) {
 // Draws x and y axes
 function drawAxes(ctx) {
   ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgb(62, 66, 74)';
   ctx.beginPath();
   // Draw axes in the middle
   ctx.moveTo(0, plane.height/2);
@@ -230,7 +231,7 @@ function drawLine() {
   if (pt1.pinned && plane.getContext) {
     let ctx = plane.getContext('2d');
     ctx.beginPath();
-    ctx.strokeStyle = 'rgb(28, 92, 28)';
+    ctx.strokeStyle = 'rgb(45, 166, 87)';
     // when pt2 is not pinned, line is dotted
     if (!pt2.pinned) {
       ctx.setLineDash([5, 5]);
@@ -353,7 +354,7 @@ function drawYIntLabel() {
   // highlight y int in equation
   if (b != 0) {  // make sure element exists
     document.getElementById("yint").style.backgroundColor =
-      "rgba(227,167,152,.9)";
+      "rgba(235, 204, 204,.9)";
   }
 }
 
@@ -369,8 +370,12 @@ function removeYIntLabel() {
 function showSlopeCalc() {
   let slopeSpan = document.getElementById("slope");
   let label = document.getElementById("slopeLabel");
-  let eq = "(" + pt2.y + "-" + pt1.y + ") / (" + pt2.x + "-" + pt1.x + ")";
+  // span elements add style to coord values so colors correspond
+  let eq = "((<span class='pt2'>" + pt2.y + "</span>-<span class='pt1'>" +
+    pt1.y + "</span>) / (<span class='pt2'>" + pt2.x +
+    "</span>-<span class='pt1'>" + pt1.x + "</span>))";
   slopeSpan.innerHTML = eq;
+  slopeSpan.style.backgroundColor="rgba(206, 211, 237, .9)";
 }
 
 // Changes equation to no longer demonstrate how slope is calculated
@@ -381,6 +386,7 @@ function removeSlopeCalc() {
     b + '</span>';
   }
   eq.innerHTML = html;
+  document.getElementById('slope').style.backgroundColor="transparent";
   reapplyListeners();
 }
 
