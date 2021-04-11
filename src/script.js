@@ -83,6 +83,8 @@ function hideElements() {
   document.getElementById("intercept").hidden = true;
   document.getElementById("slopeLabel").hidden = true;
   document.getElementById("yIntLabel").hidden = true;
+  document.getElementById("pt1Label").hidden = true;
+  document.getElementById("pt2Label").hidden = true;
 }
 
 // Prepares coordinate plane for drawing
@@ -343,6 +345,26 @@ function drawSlopeLabel() {
   }
 }
 
+// Displays point coordinates in a label
+function drawPtLabel(pt, id) {
+  // determine whether to show label for pt1 or pt2
+  let label = (id == "pt1") ? document.getElementById("pt1Label") :
+    document.getElementById("pt2Label");
+  screenPos = planeCoordToAbsScreenPosition(pt.x, pt.y, 10, 0);
+  label.hidden = false;
+  label.innerHTML = "(" + pt.x + ", " + pt.y + ")";
+  label.style.left = screenPos.x + "px";
+  label.style.top = screenPos.y + "px";
+}
+
+// Remove point label when not hovering over point
+function removePtLabel(pt, id) {
+  // determine whether to show label for pt1 or pt2
+  let label = (id == "pt1") ? document.getElementById("pt1Label") :
+    document.getElementById("pt2Label");
+  label.hidden = true;
+}
+
 // Displays y intercept coordinates in a label
 function drawYIntLabel() {
   let label = document.getElementById("yIntLabel");
@@ -368,14 +390,16 @@ function removeYIntLabel() {
 
 // Changes equation to demonstrate how slope is calculated
 function showSlopeCalc() {
-  let slopeSpan = document.getElementById("slope");
-  let label = document.getElementById("slopeLabel");
-  // span elements add style to coord values so colors correspond
-  let eq = "((<span class='pt2'>" + pt2.y + "</span>-<span class='pt1'>" +
-    pt1.y + "</span>) / (<span class='pt2'>" + pt2.x +
-    "</span>-<span class='pt1'>" + pt1.x + "</span>))";
-  slopeSpan.innerHTML = eq;
-  slopeSpan.style.backgroundColor="rgba(206, 211, 237, .9)";
+  if (m != 0 && isFinite(m) && !isNaN(m)) {  // error checking
+    let slopeSpan = document.getElementById("slope");
+    let label = document.getElementById("slopeLabel");
+    // span elements add style to coord values so colors correspond
+    let eq = "((<span class='pt2'>" + pt2.y + "</span>-<span class='pt1'>" +
+      pt1.y + "</span>) / (<span class='pt2'>" + pt2.x +
+      "</span>-<span class='pt1'>" + pt1.x + "</span>))";
+    slopeSpan.innerHTML = eq;
+    slopeSpan.style.backgroundColor="rgba(206, 211, 237, .9)";
+  }
 }
 
 // Changes equation to no longer demonstrate how slope is calculated
@@ -475,4 +499,14 @@ document.getElementById("slopeLabel").addEventListener("mouseenter",
   showSlopeCalc, false);
 document.getElementById("slopeLabel").addEventListener("mouseleave",
   removeSlopeCalc, false);
+// listeners for hovering over pt1
+document.getElementById("pt1").addEventListener("mouseenter",
+  function() {drawPtLabel(pt1, "pt1")}, false);
+document.getElementById("pt1").addEventListener("mouseleave",
+  function() {removePtLabel(pt1, "pt1")}, false);
+// listeners for hovering over pt2
+document.getElementById("pt2").addEventListener("mouseenter",
+  function() {drawPtLabel(pt2, "pt2")}, false);
+document.getElementById("pt2").addEventListener("mouseleave",
+  function() {removePtLabel(pt2, "pt2")}, false);
 update();

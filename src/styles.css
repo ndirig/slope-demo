@@ -32,6 +32,16 @@ input[type=text] {
   color: rgb(173, 46, 40);
 }
 
+#pt1Label {
+  background-color: rgba(198, 184, 227,.9);
+  color: rgb(67, 37, 125);
+}
+
+#pt2Label {
+  background-color: rgba(235, 211, 171,.9);
+  color: rgb(138, 95, 21);
+}
+
 #pt1 {
   background-color: rgb(131, 73, 245);
   border: 3px solid rgba(67, 37, 125, .5);
