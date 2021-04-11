@@ -399,6 +399,9 @@ function showSlopeCalc() {
       "</span>-<span class='pt1'>" + pt1.x + "</span>))";
     slopeSpan.innerHTML = eq;
     slopeSpan.style.backgroundColor="rgba(206, 211, 237, .9)";
+    // display labels next to points to help explain calculation
+    drawPtLabel(pt1, "pt1");
+    drawPtLabel(pt2, "pt2");
   }
 }
 
@@ -411,6 +414,8 @@ function removeSlopeCalc() {
   }
   eq.innerHTML = html;
   document.getElementById('slope').style.backgroundColor="transparent";
+  removePtLabel(pt1, "pt1")
+  removePtLabel(pt2, "pt2")
   reapplyListeners();
 }
 
@@ -487,6 +492,8 @@ function mouseClick(e) {
 
 // takes width and height as args
 initPlane(500,400);
+
+// many listeners..
 plane.addEventListener("mousemove", getMousePosition, false);
 plane.addEventListener("click", mouseClick, false);
 // listeners for hovering over y intercept
@@ -509,4 +516,6 @@ document.getElementById("pt2").addEventListener("mouseenter",
   function() {drawPtLabel(pt2, "pt2")}, false);
 document.getElementById("pt2").addEventListener("mouseleave",
   function() {removePtLabel(pt2, "pt2")}, false);
+
+// the redraw function
 update();
