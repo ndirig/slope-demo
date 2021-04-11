@@ -8,6 +8,8 @@ let plane = document.getElementById('coordinatePlane');
 // Pixels between coordinates for plane at current size
 let gridSpacing = 0;
 
+let slopeHoverTrigger = false;
+
 // Keeps track of mouse position
 let mouseX = 0;
 let mouseY = 0;
@@ -249,7 +251,8 @@ function drawLine() {
 
 // Displays correct values of m and b in the equation header
 function displayEquation() {
-  if (!(pt1.pinned && pt2.pinned)) {  // do not redraw eq if points pinned
+  // do not redraw eq if points pinned
+  if (!(pt1.pinned && pt2.pinned)) {
     let eq = document.getElementById("eq");
     let html;
     // recalculates slope and y intercept
@@ -260,21 +263,29 @@ function displayEquation() {
       html = 'y=<span id="slope">m</span>x+<span id="yint">b</span>';
     }
     // account for undefined slope
-    else if (!isFinite(m) || isNaN(m)) {
-      html = "Undefined slope";
-    }
-    else if (m == 0) {
-      html = 'y=<span id="yint">' + b + '</span>';
-    }
-    else if (b == 0) {
-      html = 'y=<span id="slope">' + m + '</span>x';
-    }
+    else if (!isFinite(m) || isNaN(m)) { html = "Undefined slope"; }
+    else if (m == 0) { html = 'y=<span id="yint">' + b + '</span>'; }
+    else if (b == 0) { html = 'y=<span id="slope">' + m + '</span>x'; }
     else {  // change m and y values in equation header
       html = 'y=<span id="slope">' + m + '</span>x+<span id="yint">' +
       b + '</span>';
     }
     // do not redraw eq if nothing is changing -- no extra work
-    if (eq.innerHTML !== html) eq.innerHTML = html;
+    if (eq.innerHTML !== html) {
+      eq.innerHTML = html;
+      // listeners for equation elements must be reapplied if eq changes
+      reapplyListeners();
+    }
+  }
+}
+
+// Reapplies listeners to equation header elements
+function reapplyListeners() {
+  if (m != 0 && isFinite(m) && !isNaN(m)) {
+    document.getElementById("slope").addEventListener("mouseenter",
+      showSlopeCalc, false);
+    document.getElementById("slope").addEventListener("mouseleave",
+      removeSlopeCalc, false);
   }
 }
 
@@ -354,6 +365,25 @@ function removeYIntLabel() {
   document.getElementById("yIntLabel").hidden = true;
 }
 
+// Changes equation to demonstrate how slope is calculated
+function showSlopeCalc() {
+  let slopeSpan = document.getElementById("slope");
+  let label = document.getElementById("slopeLabel");
+  let eq = "(" + pt2.y + "-" + pt1.y + ") / (" + pt2.x + "-" + pt1.x + ")";
+  slopeSpan.innerHTML = eq;
+}
+
+// Changes equation to no longer demonstrate how slope is calculated
+function removeSlopeCalc() {
+  if (b == 0) { html = 'y=<span id="slope">' + m + '</span>x'; }
+  else {  // change m and y values in equation header
+    html = 'y=<span id="slope">' + m + '</span>x+<span id="yint">' +
+    b + '</span>';
+  }
+  eq.innerHTML = html;
+  reapplyListeners();
+}
+
 // Redraws coordinate plane and equation
 function update() {
   drawPlane();
@@ -390,17 +420,19 @@ function pinPoint(id, pt) {
 
 // Draws dash mark on x axis where y intercept lies
 function drawYIntDash() {
-  document.getElementById("intercept").hidden = false;
-  // Offset to account for dimensions of dash element.  Ensures
-  // that the center of dash aligns with where the user clicked
-  let dashOffsetY = document.getElementById("intercept").offsetHeight / -2;
-  let dashOffsetX = document.getElementById("intercept").offsetWidth / -2;
+  if (isFinite(m)) {
+    document.getElementById("intercept").hidden = false;
+    // Offset to account for dimensions of dash element.  Ensures
+    // that the center of dash aligns with where the user clicked
+    let dashOffsetY = document.getElementById("intercept").offsetHeight / -2;
+    let dashOffsetX = document.getElementById("intercept").offsetWidth / -2;
 
-  // take calculated y int and translate to find absolute screen position
-  let absPos = planeCoordToAbsScreenPosition(0, b, dashOffsetX, dashOffsetY);
+    // take calculated y int and translate to find absolute screen position
+    let absPos = planeCoordToAbsScreenPosition(0, b, dashOffsetX, dashOffsetY);
 
-  document.getElementById("intercept").style.left = absPos.x + "px";
-  document.getElementById("intercept").style.top = absPos.y + "px";
+    document.getElementById("intercept").style.left = absPos.x + "px";
+    document.getElementById("intercept").style.top = absPos.y + "px";
+  }
 }
 
 // Draws point elements on plane when user clicks to pin point
@@ -427,6 +459,7 @@ function mouseClick(e) {
 initPlane(500,400);
 plane.addEventListener("mousemove", getMousePosition, false);
 plane.addEventListener("click", mouseClick, false);
+// listeners for hovering over y intercept
 document.getElementById("intercept").addEventListener("mouseenter",
   drawYIntLabel, false);
 document.getElementById("intercept").addEventListener("mouseleave",
