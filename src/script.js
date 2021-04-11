@@ -8,8 +8,6 @@ let plane = document.getElementById('coordinatePlane');
 // Pixels between coordinates for plane at current size
 let gridSpacing = 0;
 
-let slopeHoverTrigger = false;
-
 // Keeps track of mouse position
 let mouseX = 0;
 let mouseY = 0;
@@ -490,6 +488,23 @@ function mouseClick(e) {
   drawPinnedPoint();
 }
 
+// Resets coordinate plane
+function reset() {
+  // reset variables
+  m = 0;
+  b = 0;
+  pt1 = { x: 0, y: 0, canvasPosX: 0, canvasPosY: 0, pinned: false };
+  pt2 = { x: 0, y: 0, canvasPosX: 0, canvasPosY: 0, pinned: false };
+
+  initPlane(plane.width,plane.height);
+  // TODO!!
+  // reset equation header listeners
+  /*document.getElementById("slope").removeEventListener("mouseenter",
+    showSlopeCalc, false);
+  document.getElementById("slope").removeEventListener("mouseleave",
+    removeSlopeCalc, false);*/
+}
+
 // takes width and height as args
 initPlane(500,400);
 
@@ -516,6 +531,8 @@ document.getElementById("pt2").addEventListener("mouseenter",
   function() {drawPtLabel(pt2, "pt2")}, false);
 document.getElementById("pt2").addEventListener("mouseleave",
   function() {removePtLabel(pt2, "pt2")}, false);
+// listener for clear button -- reset coord plane
+document.getElementById("clear").addEventListener("click", reset, false);
 
 // the redraw function
 update();
