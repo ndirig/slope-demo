@@ -470,4 +470,9 @@ document.getElementById("intercept").addEventListener("mouseenter",
   drawYIntLabel, false);
 document.getElementById("intercept").addEventListener("mouseleave",
   removeYIntLabel, false);
+// listeners for hovering over slope label
+document.getElementById("slopeLabel").addEventListener("mouseenter",
+  showSlopeCalc, false);
+document.getElementById("slopeLabel").addEventListener("mouseleave",
+  removeSlopeCalc, false);
 update();
