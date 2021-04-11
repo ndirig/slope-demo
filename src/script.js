@@ -318,14 +318,14 @@ function calcMidpoint(x1, y1, x2, y2) {
 function drawSlopeLabel() {
   let label = document.getElementById("slopeLabel");
     // display when first point is pinned.  do not redraw if nothing changed
-  if (pt1.pinned && m != label.innerHTML) {
+  if (pt1.pinned && m != label.innerHTML.substring(2)) {
     // find midpoint of line, put the label there
     midpoint = calcMidpoint(pt1.x, pt1.y,
       pt2.x, pt2.y);
     screenPos = planeCoordToAbsScreenPosition(midpoint.x, midpoint.y,
       0, 0);
     label.hidden = false;
-    label.innerHTML = m;
+    label.innerHTML = "m=" + m;
     label.style.left = screenPos.x + "px";
     label.style.top = screenPos.y + "px";
   }
@@ -339,6 +339,19 @@ function drawYIntLabel() {
   label.innerHTML = "(0, " + b + ")";
   label.style.left = screenPos.x + "px";
   label.style.top = screenPos.y + "px";
+  // highlight y int in equation
+  if (b != 0) {  // make sure element exists
+    document.getElementById("yint").style.backgroundColor =
+      "rgba(227,167,152,.9)";
+  }
+}
+
+// Remove y intercept label when not hovering over intercept
+function removeYIntLabel() {
+  if (b != 0) {  // make sure element exists
+    document.getElementById("yint").style.backgroundColor="transparent";
+  }
+  document.getElementById("yIntLabel").hidden = true;
 }
 
 // Redraws coordinate plane and equation
@@ -417,5 +430,5 @@ plane.addEventListener("click", mouseClick, false);
 document.getElementById("intercept").addEventListener("mouseenter",
   drawYIntLabel, false);
 document.getElementById("intercept").addEventListener("mouseleave",
-  function(){ document.getElementById("yIntLabel").hidden = true; }, false);
+  removeYIntLabel, false);
 update();
