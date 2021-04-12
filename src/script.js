@@ -447,6 +447,10 @@ function showRiseOverRun() {
     ctx.stroke();
     // reset line dash to be solid
     ctx.setLineDash([]);
+    // change slope label to demonstrate slope calculation
+    let rise = (pt2.y - pt1.y).toFixed(2);
+    let run = (pt2.x - pt1.x).toFixed(2);
+    document.getElementById("slopeLabel").innerHTML = "m="+rise+"/"+run;
   }
 }
 
