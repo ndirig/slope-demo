@@ -12,6 +12,8 @@ let gridSpacing = 0;
 let mouseX = 0;
 let mouseY = 0;
 
+let riseRunDisplay = false;
+
 // Slope
 let m = 0;
 // y intercept
@@ -388,7 +390,8 @@ function removeYIntLabel() {
 
 // Changes equation to demonstrate how slope is calculated
 function showSlopeCalc() {
-  if (m != 0 && isFinite(m) && !isNaN(m)) {  // error checking
+  // error checking
+  if (m != 0 && pt1.pinned && pt2.pinned && isFinite(m) && !isNaN(m)) {
     let slopeSpan = document.getElementById("slope");
     let label = document.getElementById("slopeLabel");
     // span elements add style to coord values so colors correspond
@@ -397,7 +400,8 @@ function showSlopeCalc() {
       "</span>-<span class='pt1'>" + pt1.x + "</span>))";
     slopeSpan.innerHTML = eq;
     slopeSpan.style.backgroundColor="rgba(206, 211, 237, .9)";
-    // display labels next to points to help explain calculation
+    // triggers showRiseOverRun method
+    riseRunDisplay = true;
     drawPtLabel(pt1, "pt1");
     drawPtLabel(pt2, "pt2");
   }
@@ -412,9 +416,38 @@ function removeSlopeCalc() {
   }
   eq.innerHTML = html;
   document.getElementById('slope').style.backgroundColor="transparent";
+  riseRunDisplay = false;
   removePtLabel(pt1, "pt1")
   removePtLabel(pt2, "pt2")
   reapplyListeners();
+}
+
+// Demonstrate graphically how rise over run can be used to calculate slope
+function showRiseOverRun() {
+  // draw rise and run lines
+  if (riseRunDisplay && pt1.pinned && pt2.pinned && plane.getContext) {
+    // calculate pixel offset from based on the radius of a point
+    let ptOffset = (document.querySelector(".point").offsetWidth / 2);
+    let ctx = plane.getContext('2d');
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgb(100,100,100)';
+    ctx.setLineDash([5, 5]);
+    // moving dotted line animation
+    ctx.lineDashOffset -= .25;
+    ctx.lineWidth = 2;
+    // get coordinate where rise and run make right angle with points
+    let riseRunCoord = planeCoordToAbsScreenPosition(pt2.x, pt1.y, 0, 0);
+    // draw rise line
+    ctx.moveTo(riseRunCoord.x - ptOffset, riseRunCoord.y - plane.offsetTop);
+    ctx.lineTo(pt2.canvasPosX - ptOffset + plane.offsetLeft, pt2.canvasPosY);
+    ctx.stroke();
+    // draw run line
+    ctx.moveTo(riseRunCoord.x - ptOffset, riseRunCoord.y - plane.offsetTop);
+    ctx.lineTo(pt1.canvasPosX + plane.offsetLeft, pt1.canvasPosY);
+    ctx.stroke();
+    // reset line dash to be solid
+    ctx.setLineDash([]);
+  }
 }
 
 // Redraws coordinate plane and equation
@@ -428,6 +461,9 @@ function update() {
 
   // draws numerical label next to line indicating slope
   drawSlopeLabel();
+
+  // display labels next to points to help explain calculation
+  showRiseOverRun();
 
   // updates equation to reflect current slope
   displayEquation();
