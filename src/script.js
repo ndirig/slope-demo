@@ -332,7 +332,7 @@ function calcMidpoint(x1, y1, x2, y2) {
 function drawSlopeLabel() {
   let label = document.getElementById("slopeLabel");
     // display when points are pinned.  do not redraw if nothing changed
-  if (pt1.pinned && pt2.pinned && m != label.innerHTML.substring(2)) {
+  if (pt1.pinned && pt2.pinned && m != label.innerHTML.substring(2) && !riseRunDisplay) {
     // find midpoint of line, put the label there
     midpoint = calcMidpoint(pt1.x, pt1.y,
       pt2.x, pt2.y);
@@ -450,7 +450,11 @@ function showRiseOverRun() {
     // change slope label to demonstrate slope calculation
     let rise = (pt2.y - pt1.y).toFixed(2);
     let run = (pt2.x - pt1.x).toFixed(2);
-    document.getElementById("slopeLabel").innerHTML = "m="+rise+"/"+run;
+    let html = '<strong>m=<span class="riseRun">'
+      + rise + '</span>/<span class="riseRun">' + run + '</span></strong>';
+    if (document.getElementById("slopeLabel").innerHTML != html) {
+      document.getElementById("slopeLabel").innerHTML = html;
+    }
   }
 }
 

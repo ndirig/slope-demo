@@ -32,6 +32,11 @@ input[type=text] {
   color: rgb(173, 46, 40);
 }
 
+.riseRun {
+  font-size: 12px;
+  color: rgb(45, 166, 87);
+}
+
 #pt1Label {
   background-color: rgba(198, 184, 227,.9);
   color: rgb(67, 37, 125);
