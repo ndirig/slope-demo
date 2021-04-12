@@ -282,7 +282,7 @@ function displayEquation() {
 
 // Reapplies listeners to equation header elements
 function reapplyListeners() {
-  if (m != 0 && isFinite(m) && !isNaN(m)) {
+  if (pt1.pinned && m != 0 && isFinite(m) && !isNaN(m)) {
     document.getElementById("slope").addEventListener("mouseenter",
       showSlopeCalc, false);
     document.getElementById("slope").addEventListener("mouseleave",
@@ -497,12 +497,11 @@ function reset() {
   pt2 = { x: 0, y: 0, canvasPosX: 0, canvasPosY: 0, pinned: false };
 
   initPlane(plane.width,plane.height);
-  // TODO!!
   // reset equation header listeners
-  /*document.getElementById("slope").removeEventListener("mouseenter",
-    showSlopeCalc, false);
+  document.getElementById("slope").removeEventListener("mouseenter",
+    showSlopeCalc, true);
   document.getElementById("slope").removeEventListener("mouseleave",
-    removeSlopeCalc, false);*/
+    removeSlopeCalc, true);
 }
 
 // takes width and height as args
