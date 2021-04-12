@@ -329,8 +329,8 @@ function calcMidpoint(x1, y1, x2, y2) {
 // Draw a label next to the line indicating slope
 function drawSlopeLabel() {
   let label = document.getElementById("slopeLabel");
-    // display when first point is pinned.  do not redraw if nothing changed
-  if (pt1.pinned && m != label.innerHTML.substring(2)) {
+    // display when points are pinned.  do not redraw if nothing changed
+  if (pt1.pinned && pt2.pinned && m != label.innerHTML.substring(2)) {
     // find midpoint of line, put the label there
     midpoint = calcMidpoint(pt1.x, pt1.y,
       pt2.x, pt2.y);
@@ -453,7 +453,7 @@ function pinPoint(id, pt) {
 
 // Draws dash mark on x axis where y intercept lies
 function drawYIntDash() {
-  if (isFinite(m)) {
+  if (isFinite(m) && Math.abs(b) < ((plane.height/gridSpacing)/2)) {
     document.getElementById("intercept").hidden = false;
     // Offset to account for dimensions of dash element.  Ensures
     // that the center of dash aligns with where the user clicked
