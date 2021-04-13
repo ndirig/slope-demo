@@ -491,25 +491,22 @@ function showRiseOverRun() {
 
 // Draws the rise and run lines in coordinate plane
 function drawRiseRunLines() {
-  // calculate pixel offset from based on the radius of a point
-  let ptOffset = (document.querySelector(".point").offsetWidth / 2);
   let ctx = plane.getContext('2d');
   ctx.beginPath();
   ctx.strokeStyle = 'rgb(45, 166, 87)';
   ctx.setLineDash([5, 5]);
   // moving dotted line animation
   ctx.lineDashOffset -= .25;
-
   ctx.lineWidth = 2;
   // get coordinate where rise and run make right angle with points
   let riseRunCoord = planeCoordToAbsScreenPosition(pt2.x, pt1.y, 0, 0);
   // draw rise line
-  ctx.moveTo(riseRunCoord.x - ptOffset, riseRunCoord.y - plane.offsetTop);
-  ctx.lineTo(pt2.canvasPosX - ptOffset + plane.offsetLeft, pt2.canvasPosY);
+  ctx.moveTo(riseRunCoord.x - plane.offsetLeft, riseRunCoord.y - plane.offsetTop);
+  ctx.lineTo(pt2.canvasPosX, pt2.canvasPosY);
   ctx.stroke();
   // draw run line
-  ctx.moveTo(riseRunCoord.x - ptOffset, riseRunCoord.y - plane.offsetTop);
-  ctx.lineTo(pt1.canvasPosX + plane.offsetLeft, pt1.canvasPosY);
+  ctx.moveTo(riseRunCoord.x - plane.offsetLeft, riseRunCoord.y - plane.offsetTop);
+  ctx.lineTo(pt1.canvasPosX, pt1.canvasPosY);
   ctx.stroke();
   // reset line dash to be solid
   ctx.setLineDash([]);
