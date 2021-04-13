@@ -297,10 +297,18 @@ function reapplyListeners() {
 // Finds coordinates where an infinite line intercepts the boundary edges
 // of the canvas
 function getPlaneBoundaryIntercepts() {
+  // boundary case, handle separately
+  if (!isFinite(m)) {
+    return {
+      xBoundary1: pt1.canvasPosX,
+      yBoundary1: 0,
+      xBoundary2: pt1.canvasPosX,
+      yBoundary2: plane.height
+    };
+  }
   // Using y=mx+b to find bounds.  Negatives account for opposite y direction
   let bound1y = (-1 * m * (plane.width / 2)) - (b * gridSpacing);
   let bound2y = (m * (plane.width / 2)) - (b * gridSpacing);
-
   return {
     // we found boundary ints above with x = 0 and width (notice I accounted
     // for the origin offset in that calculation)
@@ -334,7 +342,8 @@ function calcMidpoint(x1, y1, x2, y2) {
 function drawSlopeLabel() {
   let label = document.getElementById("slopeLabel");
     // display when points are pinned.  do not redraw if nothing changed
-  if (pt1.pinned && pt2.pinned && m != label.innerHTML.substring(2) && !riseRunDisplay) {
+  if (pt1.pinned && pt2.pinned && m != label.innerHTML.substring(2)
+    && isFinite(m) && m != 0 && !riseRunDisplay) {
     // find midpoint of line, put the label there
     midpoint = calcMidpoint(pt1.x, pt1.y, pt2.x, pt2.y);
     screenPos = planeCoordToAbsScreenPosition(midpoint.x, midpoint.y, 0, 0);
@@ -590,10 +599,12 @@ function reset() {
 
   initPlane(plane.width,plane.height);
   // reset equation header listeners
-  document.getElementById("slope").removeEventListener("mouseenter",
-    showSlopeCalc, true);
-  document.getElementById("slope").removeEventListener("mouseleave",
-    removeSlopeCalc, true);
+  if (m != 0) {
+    document.getElementById("slope").removeEventListener("mouseenter",
+      showSlopeCalc, true);
+    document.getElementById("slope").removeEventListener("mouseleave",
+      removeSlopeCalc, true);
+  }
 }
 
 // takes width and height as args
