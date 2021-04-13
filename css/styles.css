@@ -109,3 +109,28 @@ input[type=checkbox]:checked + label {
   background-color: rgba(190, 237, 183, .9);
   border: 2px solid rgba(190, 237, 183, .9);
 }
+
+h1 {
+  margin: 0 auto;
+  text-align: center;
+  font-size: 18px;
+  padding-top: 20px;
+}
+
+header {
+  margin: 0 auto;
+  text-align: center;
+}
+
+h2 {
+  margin: 0 auto;
+  text-align: center;
+  font-size: 40px;
+}
+
+/* Top level div - coordinate plane */
+body > div {
+  margin: 0 auto;
+  text-align: center;
+  padding: 5px;
+}
