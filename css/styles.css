@@ -3,6 +3,32 @@ input[type=text] {
   width: 20px;
 }
 
+.img {
+  width: 20px;
+  height: 25px;
+  padding: 5px 10px 5px 10px;
+  border: 1px solid rgb(62, 66, 74);
+  border-radius: 10%;
+}
+
+input[type=checkbox] {
+  display: none;
+}
+
+input[type=checkbox] + label {
+  background: url('../img/int_snap.png');
+  background-repeat: no-repeat;
+  background-size: 30px 35px;
+  background-position: center;
+  display: inline-block;
+}
+
+input[type=checkbox]:checked + label {
+  background-color: rgba(134, 173, 240, .6);
+  display: inline-block;
+  border: 1px solid rgb(100,100,255);
+}
+
 #intercept {
   width: 14px;
   height: 5px;

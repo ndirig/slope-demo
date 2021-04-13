@@ -4,26 +4,19 @@
 <head>
   <title>Slope Demonstration</title>
   <meta charset="utf-8"/>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
 
   <header>
-
-    <button id="clear">Clear</button>
-    <label for="pt1InputX">Pt. 1</label>
-    <input type="text" id="pt1InputX" placeholder="x"/>
-    <input type="text" id="pt1InputY" placeholder="y"/>
-    <label for="pt2InputX">Pt. 2</label>
-    <input type="text" id="pt2InputX" placeholder="x"/>
-    <input type="text" id="pt2InputY" placeholder="y"/>
-    <label for="intSnap">Integer Snap</label>
+    <input type="image" class="img" src="img/clear.png" alt="Clear" id="clear"/>
     <input type="checkbox" id="intSnap" checked/>
-
+    <label class="img" for="intSnap"/>
   </header>
 
-  <h1 id='eq'>y=<span id='slope'>m</span>x+<span id='yint'>b</span></h1>
+  <h1>Slope Intercept Demonstration<h1>
+  <h2 id='eq'>y=<span id='slope'>m</span>x+<span id='yint'>b</span></h2>
 
   <div>
       <canvas id="coordinatePlane">Interactive coordinate plane</canvas>
@@ -40,6 +33,6 @@
   </div>
 
   <!-- Script must be after Canvas element -->
-  <script src="script.js"></script>
+  <script src="js/script.js"></script>
 </body>
 </html>
