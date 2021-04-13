@@ -117,7 +117,7 @@ h1 {
   padding-top: 20px;
 }
 
-header {
+footer {
   margin: 0 auto;
   text-align: center;
 }
@@ -133,4 +133,8 @@ body > div {
   margin: 0 auto;
   text-align: center;
   padding: 5px;
+}
+
+body {
+  font-family: "Nunito", "Roboto", sans-serif;
 }
