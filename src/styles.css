@@ -20,7 +20,6 @@ input[type=text] {
 #slopeLabel {
   background-color: rgba(206, 211, 237, .9);
   border: 2px solid rgba(206, 211, 237, .9);
-  font-size: 12px;
 }
 
 #yIntLabel {
@@ -30,11 +29,6 @@ input[type=text] {
 
 #yint, #yIntLabel {
   color: rgb(173, 46, 40);
-}
-
-.riseRun {
-  font-size: 12px;
-  color: rgb(45, 166, 87);
 }
 
 #pt1Label {
@@ -67,9 +61,10 @@ input[type=text] {
 }
 
 .label {
-  font-size: 20px;
+  font-size: 12px;
   position: absolute;
   border-radius: 10%;
+  font-weight: bold;
 }
 
 .pt1 {
@@ -78,4 +73,13 @@ input[type=text] {
 
 .pt2 {
   color: rgb(232, 157, 28);
+}
+
+.riseRun {
+  color: rgb(45, 166, 87);
+}
+
+.rrLabel {
+  background-color: rgba(190, 237, 183, .9);
+  border: 2px solid rgba(190, 237, 183, .9);
 }

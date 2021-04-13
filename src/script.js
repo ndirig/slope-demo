@@ -85,6 +85,8 @@ function hideElements() {
   document.getElementById("yIntLabel").hidden = true;
   document.getElementById("pt1Label").hidden = true;
   document.getElementById("pt2Label").hidden = true;
+  document.getElementById("riseRun1").hidden = true;
+  document.getElementById("riseRun2").hidden = true;
 }
 
 // Prepares coordinate plane for drawing
@@ -194,11 +196,11 @@ function planeCoordToAbsScreenPosition(coordX, coordY, offsetX, offsetY) {
     plane.offsetLeft + offsetX;
   let screenPosY = (-1 * coordY * gridSpacing) + (plane.height / 2) +
     plane.offsetTop + offsetY;
+  // -1 flips y direction to graphics coord system (pos y goes down)
 
   return {
     x: screenPosX,
     y: screenPosY
-    // -1 flips y direction to graphics coord system (pos y goes down)
   };
 }
 
@@ -334,10 +336,8 @@ function drawSlopeLabel() {
     // display when points are pinned.  do not redraw if nothing changed
   if (pt1.pinned && pt2.pinned && m != label.innerHTML.substring(2) && !riseRunDisplay) {
     // find midpoint of line, put the label there
-    midpoint = calcMidpoint(pt1.x, pt1.y,
-      pt2.x, pt2.y);
-    screenPos = planeCoordToAbsScreenPosition(midpoint.x, midpoint.y,
-      0, 0);
+    midpoint = calcMidpoint(pt1.x, pt1.y, pt2.x, pt2.y);
+    screenPos = planeCoordToAbsScreenPosition(midpoint.x, midpoint.y, 0, 0);
     label.hidden = false;
     label.innerHTML = "m=" + m;
     label.style.left = screenPos.x + "px";
@@ -388,6 +388,45 @@ function removeYIntLabel() {
   document.getElementById("yIntLabel").hidden = true;
 }
 
+// Displays rise and run values
+function drawRiseRunLabels() {
+  let label1 = document.getElementById("riseRun1");
+  let label2 = document.getElementById("riseRun2");
+  let html1 = Math.abs((pt2.x - pt1.x)).toFixed(2);
+  let html2 = Math.abs((pt2.y - pt1.y)).toFixed(2);
+  drawRRLabel(label1,html1,pt2.x,pt1.y,pt1.x,pt1.y,true);
+  drawRRLabel(label2,html2,pt2.x,pt1.y,pt2.x,pt2.y,false);
+}
+
+// Remove rise run labels when not hovering over slope label
+function removeRiseRunLabels() {
+  let label1 = document.getElementById("riseRun1");
+  let label2 = document.getElementById("riseRun2");
+  label1.hidden = true;
+  label2.hidden = true;
+}
+
+// Draws a label at a given location
+function drawRRLabel(label, html, aX, aY, bX, bY, onXAxis) {
+  label.innerHTML = html;
+  label.hidden = false;
+  let offsetX = 0;
+  let offsetY = 0;
+  // To make it look nice and centered, specify different offsets based on axis
+  if (onXAxis) {
+    offsetX = label.offsetWidth / -2;
+    offsetY = label.offsetWidth * -1;
+  } else {
+    offsetX = label.offsetWidth * .25;
+    offsetY = label.offsetWidth / -2;
+  }
+  let midpoint = calcMidpoint(aX, aY, bX, bY);
+  screenPos = planeCoordToAbsScreenPosition(midpoint.x, midpoint.y,
+    offsetX, offsetY);
+  label.style.left = screenPos.x + "px";
+  label.style.top = screenPos.y + "px";
+}
+
 // Changes equation to demonstrate how slope is calculated
 function showSlopeCalc() {
   // error checking
@@ -404,6 +443,7 @@ function showSlopeCalc() {
     riseRunDisplay = true;
     drawPtLabel(pt1, "pt1");
     drawPtLabel(pt2, "pt2");
+    drawRiseRunLabels();
   }
 }
 
@@ -419,6 +459,7 @@ function removeSlopeCalc() {
   riseRunDisplay = false;
   removePtLabel(pt1, "pt1")
   removePtLabel(pt2, "pt2")
+  removeRiseRunLabels();
   reapplyListeners();
 }
 
@@ -426,36 +467,43 @@ function removeSlopeCalc() {
 function showRiseOverRun() {
   // draw rise and run lines
   if (riseRunDisplay && pt1.pinned && pt2.pinned && plane.getContext) {
-    // calculate pixel offset from based on the radius of a point
-    let ptOffset = (document.querySelector(".point").offsetWidth / 2);
-    let ctx = plane.getContext('2d');
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgb(100,100,100)';
-    ctx.setLineDash([5, 5]);
-    // moving dotted line animation
-    ctx.lineDashOffset -= .25;
-    ctx.lineWidth = 2;
-    // get coordinate where rise and run make right angle with points
-    let riseRunCoord = planeCoordToAbsScreenPosition(pt2.x, pt1.y, 0, 0);
-    // draw rise line
-    ctx.moveTo(riseRunCoord.x - ptOffset, riseRunCoord.y - plane.offsetTop);
-    ctx.lineTo(pt2.canvasPosX - ptOffset + plane.offsetLeft, pt2.canvasPosY);
-    ctx.stroke();
-    // draw run line
-    ctx.moveTo(riseRunCoord.x - ptOffset, riseRunCoord.y - plane.offsetTop);
-    ctx.lineTo(pt1.canvasPosX + plane.offsetLeft, pt1.canvasPosY);
-    ctx.stroke();
-    // reset line dash to be solid
-    ctx.setLineDash([]);
-    // change slope label to demonstrate slope calculation
+    drawRiseRunLines();
+    // change slope label to demonstrate rise/run slope calculation
     let rise = (pt2.y - pt1.y).toFixed(2);
     let run = (pt2.x - pt1.x).toFixed(2);
-    let html = '<strong>m=<span class="riseRun">'
-      + rise + '</span>/<span class="riseRun">' + run + '</span></strong>';
+    let html = 'm=<span class="riseRun">'
+      + rise + '</span>/<span class="riseRun">' + run + '</span>';
     if (document.getElementById("slopeLabel").innerHTML != html) {
       document.getElementById("slopeLabel").innerHTML = html;
     }
+    // display labels for rise and run
   }
+}
+
+// Draws the rise and run lines in coordinate plane
+function drawRiseRunLines() {
+  // calculate pixel offset from based on the radius of a point
+  let ptOffset = (document.querySelector(".point").offsetWidth / 2);
+  let ctx = plane.getContext('2d');
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgb(45, 166, 87)';
+  ctx.setLineDash([5, 5]);
+  // moving dotted line animation
+  ctx.lineDashOffset -= .25;
+
+  ctx.lineWidth = 2;
+  // get coordinate where rise and run make right angle with points
+  let riseRunCoord = planeCoordToAbsScreenPosition(pt2.x, pt1.y, 0, 0);
+  // draw rise line
+  ctx.moveTo(riseRunCoord.x - ptOffset, riseRunCoord.y - plane.offsetTop);
+  ctx.lineTo(pt2.canvasPosX - ptOffset + plane.offsetLeft, pt2.canvasPosY);
+  ctx.stroke();
+  // draw run line
+  ctx.moveTo(riseRunCoord.x - ptOffset, riseRunCoord.y - plane.offsetTop);
+  ctx.lineTo(pt1.canvasPosX + plane.offsetLeft, pt1.canvasPosY);
+  ctx.stroke();
+  // reset line dash to be solid
+  ctx.setLineDash([]);
 }
 
 // Redraws coordinate plane and equation
