@@ -269,11 +269,11 @@ function displayEquation() {
     }
     // account for undefined slope
     else if (!isFinite(m) || isNaN(m)) { html = "Undefined slope"; }
-    else if (m == 0) { html = 'y=<span id="yint">' + b + '</span>'; }
-    else if (b == 0) { html = 'y=<span id="slope">' + m + '</span>x'; }
+    else if (m == 0) { html = 'y=<span id="yint">' + b.toFixed(2) + '</span>'; }
+    else if (b == 0) { html = 'y=<span id="slope">' + m.toFixed(2) + '</span>x'; }
     else {  // change m and y values in equation header
-      html = 'y=<span id="slope">' + m + '</span>x+<span id="yint">' +
-      b + '</span>';
+      html = 'y=<span id="slope">' + m.toFixed(2) + '</span>x+<span id="yint">' +
+      b.toFixed(2) + '</span>';
     }
     // do not redraw eq if nothing is changing -- no extra work
     if (eq.innerHTML !== html) {
@@ -322,12 +322,12 @@ function getPlaneBoundaryIntercepts() {
 
 // Calculates slope between two points
 function calcSlope(a, b) {
-  return ((b.y - a.y)/(b.x - a.x)).toFixed(2);
+  return ((b.y - a.y)/(b.x - a.x));
 }
 
 // Calculates the y intercept of a line
 function calcYInt(pt, m) {
-  return (pt.y - (m * pt.x)).toFixed(2);
+  return (pt.y - (m * pt.x));
 }
 
 // Calculates the midpoint of two points
@@ -348,7 +348,7 @@ function drawSlopeLabel() {
     midpoint = calcMidpoint(pt1.x, pt1.y, pt2.x, pt2.y);
     screenPos = planeCoordToAbsScreenPosition(midpoint.x, midpoint.y, 0, 0);
     label.hidden = false;
-    label.innerHTML = "m=" + m;
+    label.innerHTML = "m=" + m.toFixed(2);
     label.style.left = screenPos.x + "px";
     label.style.top = screenPos.y + "px";
   }
@@ -361,7 +361,7 @@ function drawPtLabel(pt, id) {
     document.getElementById("pt2Label");
   screenPos = planeCoordToAbsScreenPosition(pt.x, pt.y, 10, 0);
   label.hidden = false;
-  label.innerHTML = "(" + pt.x + ", " + pt.y + ")";
+  label.innerHTML = "(" + pt.x.toFixed(2) + ", " + pt.y.toFixed(2) + ")";
   label.style.left = screenPos.x + "px";
   label.style.top = screenPos.y + "px";
 }
@@ -379,7 +379,7 @@ function drawYIntLabel() {
   let label = document.getElementById("yIntLabel");
   screenPos = planeCoordToAbsScreenPosition(0, b, 10, 0);
   label.hidden = false;
-  label.innerHTML = "(0, " + b + ")";
+  label.innerHTML = "(0, " + b.toFixed(2) + ")";
   label.style.left = screenPos.x + "px";
   label.style.top = screenPos.y + "px";
   // highlight y int in equation
@@ -443,9 +443,9 @@ function showSlopeCalc() {
     let slopeSpan = document.getElementById("slope");
     let label = document.getElementById("slopeLabel");
     // span elements add style to coord values so colors correspond
-    let eq = "((<span class='pt2'>" + pt2.y + "</span>-<span class='pt1'>" +
-      pt1.y + "</span>) / (<span class='pt2'>" + pt2.x +
-      "</span>-<span class='pt1'>" + pt1.x + "</span>))";
+    let eq = "((<span class='pt2'>" + pt2.y.toFixed(2) + "</span>-<span class='pt1'>" +
+      pt1.y.toFixed(2) + "</span>) / (<span class='pt2'>" + pt2.x.toFixed(2) +
+      "</span>-<span class='pt1'>" + pt1.x.toFixed(2) + "</span>))";
     slopeSpan.innerHTML = eq;
     slopeSpan.style.backgroundColor="rgba(206, 211, 237, .9)";
     // triggers showRiseOverRun method
@@ -458,10 +458,10 @@ function showSlopeCalc() {
 
 // Changes equation to no longer demonstrate how slope is calculated
 function removeSlopeCalc() {
-  if (b == 0) { html = 'y=<span id="slope">' + m + '</span>x'; }
+  if (b == 0) { html = 'y=<span id="slope">' + m.toFixed(2) + '</span>x'; }
   else {  // change m and y values in equation header
-    html = 'y=<span id="slope">' + m + '</span>x+<span id="yint">' +
-    b + '</span>';
+    html = 'y=<span id="slope">' + m.toFixed(2) + '</span>x+<span id="yint">' +
+    b.toFixed(2) + '</span>';
   }
   eq.innerHTML = html;
   document.getElementById('slope').style.backgroundColor="transparent";
