@@ -443,11 +443,12 @@ function showSlopeCalc() {
     let slopeSpan = document.getElementById("slope");
     let label = document.getElementById("slopeLabel");
     // span elements add style to coord values so colors correspond
-    let eq = "((<span class='pt2'>" + pt2.y.toFixed(2) + "</span>-<span class='pt1'>" +
-      pt1.y.toFixed(2) + "</span>) / (<span class='pt2'>" + pt2.x.toFixed(2) +
-      "</span>-<span class='pt1'>" + pt1.x.toFixed(2) + "</span>))";
+    let eq = "<span class='calc'>((<span class='pt2'>" + pt2.y.toFixed(2) +
+      "</span> - <span class='pt1'>" + pt1.y.toFixed(2) +
+      "</span>) / (<span class='pt2'>" + pt2.x.toFixed(2) +
+      "</span> - <span class='pt1'>" + pt1.x.toFixed(2) + "</span>))</span>";
     slopeSpan.innerHTML = eq;
-    slopeSpan.style.backgroundColor="rgba(206, 211, 237, .9)";
+    //slopeSpan.style.backgroundColor="rgba(206, 211, 237, .9)";
     // triggers showRiseOverRun method
     riseRunDisplay = true;
     drawPtLabel(pt1, "pt1");

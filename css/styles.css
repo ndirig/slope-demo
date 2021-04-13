@@ -110,6 +110,11 @@ input[type=checkbox]:checked + label {
   border: 2px solid rgba(190, 237, 183, .9);
 }
 
+.calc {
+  font-size: 26px;
+  background-color: rgba(206, 211, 237, .9);
+}
+
 h1 {
   margin: 0 auto;
   text-align: center;
